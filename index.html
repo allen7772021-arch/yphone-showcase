@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yphone — Evolve. Don't Replace.</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --bg-light: #f5f5f7;
+    --bg-alt: #fbfbfd;
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-tertiary: #6e6e73;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-dark-bg: #2997ff;
+    --border-subtle: rgba(0,0,0,0.06);
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 8px 40px rgba(0,0,0,0.08);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--white);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* ===== MAIN SCROLL CONTAINER ===== */
+  main {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: start;
+    padding: 80px 48px;
+    position: relative;
+    background: var(--white);
+  }
+  .section.alt { background: var(--bg-light); }
+
+  /* ===== TYPOGRAPHY ===== */
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 20px;
+  }
+
+  .section h2 {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    text-align: center;
+    max-width: 800px;
+    color: var(--text-primary);
+  }
+
+  .section .subhead {
+    font-size: clamp(17px, 2vw, 21px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 600px;
+    margin-top: 16px;
+  }
+
+  .section .caption {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* ===== HERO (dark) ===== */
+  #hero {
+    background: #000000;
+    color: #f5f5f7;
+  }
+  #hero .eyebrow { color: #a1a1aa; }
+  #hero h1 {
+    font-size: clamp(72px, 11vw, 140px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  #hero .hero-tagline {
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: #86868b;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  #hero .hero-desc {
+    font-size: clamp(16px, 1.8vw, 19px);
+    font-weight: 400;
+    line-height: 1.6;
+    color: #86868b;
+    text-align: center;
+    max-width: 620px;
+  }
+  #hero .hero-cta {
+    margin-top: 48px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ===== BUTTONS (Apple style) ===== */
+  .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 980px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: scale(1.02);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+  }
+  .btn-outline:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+  /* dark bg variants */
+  .dark .btn-primary {
+    background: var(--accent-dark-bg);
+  }
+  .dark .btn-outline {
+    color: var(--accent-dark-bg);
+    border-color: var(--accent-dark-bg);
+  }
+  .dark .btn-outline:hover {
+    background: var(--accent-dark-bg);
+    color: #000;
+  }
+
+  /* ===== SCROLL INDICATOR ===== */
+  .scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: #86868b;
+    animation: hintPulse 2.5s ease-in-out infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .scroll-hint .line {
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(to bottom, #86868b, transparent);
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 0.8; transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ===== STATS GRID ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    max-width: 900px;
+    width: 100%;
+    margin-top: 48px;
+  }
+  @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; gap: 20px; } }
+
+  .stat-card {
+    text-align: center;
+    padding: 32px 20px;
+    border-radius: 20px;
+    background: var(--white);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+  }
+  .stat-number {
+    font-size: clamp(44px, 6vw, 64px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .stat-unit {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .stat-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ===== CYCLE VISUAL ===== */
+  .cycle-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 48px;
+  }
+  .cycle-node {
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--white);
+    border: 1px solid var(--border-subtle);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  .cycle-node.waste {
+    color: #d32f2f;
+    background: #fef0f0;
+    border-color: rgba(211,47,47,0.15);
+  }
+  .cycle-node.aeon {
+    color: var(--accent);
+    background: #f0f7ff;
+    border-color: rgba(0,113,227,0.15);
+  }
+  .cycle-arrow {
+    font-size: 20px;
+    color: var(--text-tertiary);
+    font-weight: 300;
+  }
+  .cycle-break {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--accent);
+    padding: 16px 0 4px;
+  }
+
+  /* ===== FEATURE GRID ===== */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    width: 100%;
+    margin-top: 48px;
+  }
+  @media (max-width: 800px) { .feature-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 500px) { .feature-grid { grid-template-columns: 1fr; } }
+
+  .feature-card {
+    padding: 32px 24px;
+    border-radius: 18px;
+    background: var(--white);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: rgba(0,113,227,0.12);
+  }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: #f0f7ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+  .feature-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ===== HOW IT WORKS FLOW ===== */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .flow-node {
+    padding: 16px 20px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    background: var(--white);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
+    transition: all 0.35s ease;
+    min-width: 100px;
+  }
+  .flow-node:hover {
+    transform: scale(1.04);
+    border-color: rgba(0,113,227,0.2);
+    box-shadow: var(--shadow-card-hover);
+  }
+  .flow-node .icon { font-size: 24px; margin-bottom: 4px; }
+  .flow-node .label { font-size: 13px; color: var(--text-primary); }
+  .flow-node .sub { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+  .flow-core {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 8px 32px rgba(0,113,227,0.25);
+    flex-shrink: 0;
+    transition: all 0.4s ease;
+  }
+  .flow-core:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 44px rgba(0,113,227,0.35);
+  }
+  .flow-core .icon { font-size: 26px; margin-bottom: 2px; }
+  .flow-arrow {
+    font-size: 18px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+  }
+
+  /* ===== DASHBOARD (Apple style — clean) ===== */
+  .dashboard {
+    background: var(--white);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 680px;
+    width: 100%;
+    box-shadow: var(--shadow-card);
+    margin-top: 36px;
+  }
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dash-device {
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dash-device .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #34c759;
+    box-shadow: 0 0 6px rgba(52,199,89,0.4);
+  }
+  .dash-version {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-family: 'SF Mono', 'Cascadia Code', 'Menlo', monospace;
+  }
+  .dash-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 500px) { .dash-metrics { grid-template-columns: 1fr; } }
+  .dash-metric {
+    text-align: center;
+    padding: 16px 12px;
+    border-radius: 14px;
+    background: var(--bg-alt);
+  }
+  .dash-metric .value {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .dash-metric .label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
+  .progress-group { margin-bottom: 14px; }
+  .progress-group .pg-label {
+    display: flex; justify-content: space-between;
+    font-size: 13px; margin-bottom: 6px;
+  }
+  .progress-group .pg-label span:first-child { color: var(--text-primary); }
+  .progress-group .pg-label span:last-child {
+    color: var(--text-tertiary); font-family: 'SF Mono', 'Cascadia Code', 'Menlo', monospace; font-size: 11px;
+  }
+  .progress-bar {
+    height: 5px;
+    background: #e8e8ed;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 1.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .dash-log {
+    margin-top: 24px;
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Cascadia Code', 'Menlo', monospace;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    max-height: 110px;
+    overflow-y: hidden;
+    line-height: 1.7;
+  }
+  .dash-log .log-line { padding: 1px 0; }
+  .dash-log .log-line.ok { color: #34c759; }
+  .dash-log .log-line.info { color: var(--accent); }
+
+  .dash-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ===== COMPARISON ===== */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    max-width: 780px;
+    width: 100%;
+    margin-top: 36px;
+  }
+  @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-col {
+    border-radius: 18px;
+    padding: 32px 24px;
+    border: 1px solid var(--border-subtle);
+  }
+  .compare-col.old { background: #fef5f5; border-color: rgba(211,47,47,0.1); }
+  .compare-col.new { background: #f0f7ff; border-color: rgba(0,113,227,0.1); }
+  .compare-col h3 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .compare-col.old h3 { color: #d32f2f; }
+  .compare-col.new h3 { color: var(--accent); }
+  .compare-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; font-size: 14px; color: var(--text-primary);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .compare-row .mark { font-weight: 700; font-size: 16px; }
+  .compare-row .mark.good { color: #34c759; }
+  .compare-row .mark.bad { color: #d32f2f; }
+
+  /* ===== CLOSING (dark) ===== */
+  #closing {
+    background: #000000;
+    color: #f5f5f7;
+    text-align: center;
+  }
+  #closing h2 {
+    font-size: clamp(60px, 9vw, 120px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  #closing .closing-tagline {
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 500;
+    color: #86868b;
+    margin-bottom: 8px;
+  }
+  #closing .closing-sub {
+    font-size: 15px;
+    color: #86868b;
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+  #closing .team-info {
+    font-size: 13px;
+    color: #6e6e73;
+    margin-top: 20px;
+    line-height: 1.8;
+  }
+  #closing .team-info strong { color: #a1a1aa; }
+
+  /* ===== QR CORNER ===== */
+  .qr-corner {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 14px;
+    padding: 10px 14px 10px 10px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+  }
+  .qr-corner:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .qr-corner img {
+    width: 56px; height: 56px;
+    border-radius: 8px;
+    display: block;
+  }
+  .qr-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+    line-height: 1.4;
+    max-width: 70px;
+  }
+  .qr-label strong {
+    display: block;
+    font-size: 11px;
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  /* ===== NAV DOTS ===== */
+  .nav-dots {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .nav-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.35s ease;
+    padding: 0;
+  }
+  .dark-section .nav-dot,
+  .section.dark .nav-dot { background: rgba(255,255,255,0.25); }
+  .nav-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0,113,227,0.2);
+    transform: scale(1.25);
+  }
+  .nav-dot:hover { transform: scale(1.3); }
+
+  /* ===== AUTO-PLAY INDICATOR ===== */
+  .ap-indicator {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    opacity: 0.45;
+    transition: opacity 0.4s ease;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .ap-indicator.paused { opacity: 0.18; }
+  .ap-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: apBlink 2s ease-in-out infinite;
+  }
+  .ap-indicator.paused .ap-dot { animation: none; opacity: 0.3; }
+  @keyframes apBlink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* ===== FULLSCREEN BUTTON ===== */
+  .fs-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 100;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,0,0,0.08);
+    color: var(--text-tertiary);
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+  .fs-btn:hover {
+    border-color: rgba(0,0,0,0.15);
+    color: var(--text-primary);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
+                transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .section { padding: 60px 24px; }
+    .nav-dots { right: 8px; gap: 8px; }
+    .nav-dot { width: 6px; height: 6px; }
+    .qr-corner { bottom: 16px; left: 16px; padding: 8px 10px 8px 8px; }
+    .qr-corner img { width: 44px; height: 44px; }
+    .qr-label { font-size: 9px; max-width: 56px; }
+    .dashboard { padding: 24px 20px; }
+    .flow-row { gap: 8px; }
+    .flow-node { min-width: 80px; padding: 12px 14px; }
+    .flow-core { width: 80px; height: 80px; font-size: 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main id="mainContent">
+
+  <!-- ========== HERO ========== -->
+  <section class="section dark" id="hero" style="background:#000;">
+    <p class="eyebrow fade-up" style="color:#a1a1aa;">Banana Company presents</p>
+    <h1 class="fade-up delay-1">Yphone</h1>
+    <p class="hero-tagline fade-up delay-2">Evolve. Don't replace.</p>
+    <p class="hero-desc fade-up delay-3">
+      The first living operating system.<br>
+      AI that upgrades your device — software and hardware — forever.
+    </p>
+    <div class="hero-cta fade-up delay-4">
+      <a href="#solution" class="btn btn-primary dark">Discover Yphone</a>
+      <a href="#demo" class="btn btn-outline dark">Watch demo</a>
+    </div>
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="line"></div>
+    </div>
+  </section>
+
+  <!-- ========== THE PROBLEM ========== -->
+  <section class="section alt" id="problem">
+    <p class="eyebrow fade-up">The Problem</p>
+    <h2 class="fade-up delay-1">50 million metric tons<br>of e-waste every year.</h2>
+    <p class="subhead fade-up delay-2">
+      And it's growing faster than any other waste stream on Earth.
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card fade-up delay-1">
+        <div class="stat-number" data-count="50">0</div>
+        <div class="stat-unit">million tons</div>
+        <div class="stat-desc">Generated globally each year.<br>That's 1,000 laptops per second.</div>
+      </div>
+      <div class="stat-card fade-up delay-2">
+        <div class="stat-number" data-count="80">0</div>
+        <div class="stat-unit">percent</div>
+        <div class="stat-desc">Not formally recycled.<br>Ends up in landfills, rivers, soil.</div>
+      </div>
+      <div class="stat-card fade-up delay-3">
+        <div class="stat-number" data-count="57">0</div>
+        <div class="stat-unit">billion USD</div>
+        <div class="stat-desc">Recoverable materials lost.<br>Gold, silver, rare earths — buried.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== THE INSIGHT ========== -->
+  <section class="section" id="insight">
+    <p class="eyebrow fade-up">The Insight</p>
+    <h2 class="fade-up delay-1">
+      Devices don't die.<br>They're <span style="color:var(--accent);">designed to be replaced.</span>
+    </h2>
+    <p class="subhead fade-up delay-2">
+      Planned obsolescence is the business model. We're breaking it.
+    </p>
+    <div class="cycle-container fade-up delay-2">
+      <div class="cycle-node">Buy device</div><div class="cycle-arrow">→</div>
+      <div class="cycle-node">Software ages</div><div class="cycle-arrow">→</div>
+      <div class="cycle-node">Hardware slows</div><div class="cycle-arrow">→</div>
+      <div class="cycle-node waste">Discard → E-waste</div><div class="cycle-arrow">→</div>
+      <div class="cycle-node">Buy again</div>
+      <div class="cycle-break fade-up delay-3">Yphone breaks the cycle ↓</div>
+      <div class="cycle-node aeon">Continuous evolution</div><div class="cycle-arrow">→</div>
+      <div class="cycle-node aeon">Zero e-waste</div>
+    </div>
+  </section>
+
+  <!-- ========== THE SOLUTION ========== -->
+  <section class="section alt" id="solution">
+    <p class="eyebrow fade-up">The Solution</p>
+    <h2 class="fade-up delay-1">A device that evolves.<br>Software. Hardware. Perpetually.</h2>
+    <div class="feature-grid">
+      <div class="feature-card fade-up delay-1">
+        <div class="feature-icon">🧠</div>
+        <h3>AI-Powered OS Evolution</h3>
+        <p>Yphone Core continuously monitors performance, predicts bottlenecks, and deploys system optimizations — without a single user interaction. It gets smarter every day.</p>
+      </div>
+      <div class="feature-card fade-up delay-2">
+        <div class="feature-icon">🔩</div>
+        <h3>Modular Hardware Architecture</h3>
+        <p>CPU, GPU, memory, sensors — every component is a swappable module. Yphone identifies the bottleneck and replaces only that module. Not the whole device.</p>
+      </div>
+      <div class="feature-card fade-up delay-3">
+        <div class="feature-icon">🖨️</div>
+        <h3>AI-Designed + 3D-Printed Parts</h3>
+        <p>When a new module is needed, Yphone designs it, sends it to a distributed 3D-print network, and delivers it to your door. Plug-and-play in seconds.</p>
+      </div>
+      <div class="feature-card fade-up delay-1">
+        <div class="feature-icon">♻️</div>
+        <h3>100% Circular Regeneration</h3>
+        <p>Every replaced module is collected, refurbished by Yphone, and redeployed into another device. Nothing becomes waste. Everything becomes a resource.</p>
+      </div>
+      <div class="feature-card fade-up delay-2">
+        <div class="feature-icon">🔗</div>
+        <h3>Blockchain Component Provenance</h3>
+        <p>Each hardware module carries an on-chain record — from fabrication to every refurbishment. Full traceability. Trust in every component.</p>
+      </div>
+      <div class="feature-card fade-up delay-3">
+        <div class="feature-icon">🌍</div>
+        <h3>Zero E-Waste by 2050</h3>
+        <p>Our mission: eliminate consumer electronics waste entirely. Every chip, every sensor, every gram of rare earth — in permanent, productive use.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section class="section" id="how-it-works">
+    <p class="eyebrow fade-up">How It Works</p>
+    <h2 class="fade-up delay-1">One intelligent loop.<br>Infinite device lifespan.</h2>
+    <div class="flow-row fade-up delay-2" style="margin-top:44px;">
+      <div class="flow-node"><div class="icon">📱</div><div class="label">Your Device</div><div class="sub">Always on</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="icon">📡</div><div class="label">Live Diagnostics</div><div class="sub">Real-time scan</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-core"><div class="icon">⚙️</div>Yphone Core</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="icon">🔄</div><div class="label">OTA Update</div><div class="sub">Silent upgrade</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="icon">🔩</div><div class="label">AI Design</div><div class="sub">Module generated</div></div>
+    </div>
+    <div class="flow-row fade-up delay-3" style="margin-top:20px;">
+      <div class="flow-node"><div class="icon">🖨️</div><div class="label">3D Print</div><div class="sub">Distributed fab</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="icon">📦</div><div class="label">Delivered</div><div class="sub">Plug & play</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:rgba(52,199,89,0.2);background:#f4fdf6;">
+        <div class="icon">✅</div><div class="label" style="color:#34c759;">Evolved</div><div class="sub">Performance ↑</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LIVE DEMO ========== -->
+  <section class="section alt" id="demo">
+    <p class="eyebrow fade-up">Live Dashboard</p>
+    <h2 class="fade-up delay-1">Yphone Core<br>in action.</h2>
+    <div class="dashboard fade-up delay-2" id="dashboard">
+      <div class="dash-header">
+        <div class="dash-device">
+          <span class="dot"></span>
+          <span id="deviceName">Yphone Phone X1</span>
+        </div>
+        <div class="dash-version" id="dashVersion">Yphone OS v4.2.7</div>
+      </div>
+      <div class="dash-metrics">
+        <div class="dash-metric">
+          <div class="value" id="cpuHealth">98</div>
+          <div class="label">HEALTH SCORE %</div>
+        </div>
+        <div class="dash-metric">
+          <div class="value" id="updateCount">247</div>
+          <div class="label">LIFETIME UPDATES</div>
+        </div>
+        <div class="dash-metric">
+          <div class="value" id="ewasteSaved">12.4</div>
+          <div class="label">E-WASTE PREVENTED kg</div>
+        </div>
+      </div>
+
+      <div class="progress-group">
+        <div class="pg-label"><span>AI Neural Engine</span><span id="aiVer">Yphone-NPU v2.1</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="barAI" style="width:0%"></div></div>
+      </div>
+      <div class="progress-group">
+        <div class="pg-label"><span>System Firmware</span><span id="fwVer">Firmware Gen 8</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="barFW" style="width:0%"></div></div>
+      </div>
+      <div class="progress-group">
+        <div class="pg-label"><span>Hardware Modules</span><span id="hwVer">Gen 5 Modular</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="barHW" style="width:0%"></div></div>
+      </div>
+
+      <div class="dash-log" id="dashLog">
+        <div class="log-line info">[Yphone] System nominal — all modules healthy</div>
+      </div>
+
+      <div class="dash-actions">
+        <button class="btn btn-primary" onclick="simulateUpdate()" id="btnUpdate">
+          Simulate Yphone Update
+        </button>
+        <button class="btn btn-outline" onclick="resetDemo()">
+          Reset
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COMPARISON ========== -->
+  <section class="section" id="comparison">
+    <p class="eyebrow fade-up">At a Glance</p>
+    <h2 class="fade-up delay-1">The old way.<br>The Yphone way.</h2>
+    <div class="compare-grid fade-up delay-2">
+      <div class="compare-col old">
+        <h3>Traditional</h3>
+        <div class="compare-row"><span class="mark bad">✕</span> 2–3 year replacement cycle</div>
+        <div class="compare-row"><span class="mark bad">✕</span> Entire device discarded</div>
+        <div class="compare-row"><span class="mark bad">✕</span> Software support ends in 2 years</div>
+        <div class="compare-row"><span class="mark bad">✕</span> Repairs difficult, parts proprietary</div>
+        <div class="compare-row"><span class="mark bad">✕</span> Linear resource consumption</div>
+        <div class="compare-row"><span class="mark bad">✕</span> Massive e-waste footprint</div>
+      </div>
+      <div class="compare-col new">
+        <h3>Yphone Ecosystem</h3>
+        <div class="compare-row"><span class="mark good">✓</span> Indefinite device lifespan</div>
+        <div class="compare-row"><span class="mark good">✓</span> Only bottleneck modules replaced</div>
+        <div class="compare-row"><span class="mark good">✓</span> AI evolves the OS continuously</div>
+        <div class="compare-row"><span class="mark good">✓</span> Modular, open-standard, 3D-printable</div>
+        <div class="compare-row"><span class="mark good">✓</span> Circular regeneration economy</div>
+        <div class="compare-row"><span class="mark good">✓</span> Path to zero e-waste</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CLOSING ========== -->
+  <section class="section dark" id="closing" style="background:#000;">
+    <h2 class="fade-up">Yphone</h2>
+    <p class="closing-tagline fade-up delay-1">Evolve. Don't replace.</p>
+    <p class="closing-sub fade-up delay-2">
+      Every device deserves a lifetime.<br>
+      Every chip deserves to be used — forever.
+    </p>
+    <a href="#hero" class="btn btn-primary dark fade-up delay-3">
+      Watch Again
+    </a>
+    <div class="team-info fade-up delay-4">
+      <strong>Banana Company</strong> &nbsp;·&nbsp;
+      Angelina (Boss) &nbsp;·&nbsp;
+      Van (Design) &nbsp;·&nbsp;
+      Allen (Sales) &nbsp;·&nbsp;
+      Emma (Assistant)<br>
+      University of Western Australia &nbsp;·&nbsp; Class Concept 2026
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== QR CODE CORNER ===== -->
+<div class="qr-corner" id="qrCorner">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://uwa.edu.au"
+       alt="QR Code"
+       id="qrImage"
+       onerror="this.style.display='none';document.getElementById('qrLabel').textContent='Banana Company';">
+  <div class="qr-label" id="qrLabel">
+    Scan to<br><strong>Banana Company</strong>
+  </div>
+</div>
+
+<!-- ===== NAVIGATION DOTS ===== -->
+<nav class="nav-dots" id="navDots" aria-label="Section navigation"></nav>
+
+<!-- ===== AUTO-PLAY INDICATOR ===== -->
+<div class="ap-indicator" id="apIndicator">
+  <div class="ap-dot"></div>
+  AUTO-PLAY &nbsp;·&nbsp; tap to pause
+</div>
+
+<!-- ===== FULLSCREEN ===== -->
+<button class="fs-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle fullscreen">⛶</button>
+
+<script>
+  // ===== NAVIGATION DOTS =====
+  const sections = document.querySelectorAll('.section');
+  const navDots = document.getElementById('navDots');
+  const main = document.getElementById('mainContent');
+
+  sections.forEach((s, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot';
+    dot.setAttribute('aria-label', `Section ${i + 1}`);
+    dot.addEventListener('click', () => s.scrollIntoView({ behavior: 'smooth' }));
+    navDots.appendChild(dot);
+  });
+
+  const allDots = document.querySelectorAll('.nav-dot');
+
+  function getActiveIndex() {
+    const st = main.scrollTop;
+    const h = main.clientHeight;
+    return Math.round(st / h);
+  }
+
+  function updateDots() {
+    const idx = getActiveIndex();
+    allDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+
+    // Adjust QR corner contrast on dark sections
+    const qr = document.getElementById('qrCorner');
+    const currentSection = sections[idx];
+    if (currentSection && currentSection.classList.contains('dark')) {
+      qr.style.background = 'rgba(40,40,40,0.85)';
+      qr.style.borderColor = 'rgba(255,255,255,0.1)';
+      qr.querySelector('.qr-label').style.color = '#a1a1aa';
+      qr.querySelector('.qr-label strong').style.color = '#f5f5f7';
+    } else {
+      qr.style.background = 'rgba(255,255,255,0.85)';
+      qr.style.borderColor = 'rgba(0,0,0,0.06)';
+      qr.querySelector('.qr-label').style.color = '#6e6e73';
+      qr.querySelector('.qr-label strong').style.color = '#1d1d1f';
+    }
+
+    return idx;
+  }
+
+  main.addEventListener('scroll', updateDots, { passive: true });
+  updateDots();
+
+  // ===== FADE-UP OBSERVER =====
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const fadeObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.25 });
+  fadeEls.forEach(el => fadeObserver.observe(el));
+
+  // ===== COUNT-UP ANIMATION =====
+  function animateCount(el, target) {
+    if (el.dataset.done) return;
+    el.dataset.done = '1';
+    const start = performance.now();
+    const dur = 2000;
+    (function tick(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const v = target * (1 - Math.pow(1 - p, 3));
+      el.textContent = v < 1 ? v.toFixed(1) : Math.round(v);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    })(start);
+  }
+
+  const countObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const t = parseInt(e.target.dataset.count);
+        if (t) animateCount(e.target, t);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach(el => countObserver.observe(el));
+
+  // ===== AUTO-PLAY (Apple keynote pace: ~8s per section) =====
+  let autoplay = true;
+  let apTimer = null;
+  let idleTimer = null;
+  const AP_DURATION = 8000;   // 8s per section — deliberate, keynote feel
+  const IDLE_RESUME = 10000;  // resume autoplay after 10s idle
+  const apInd = document.getElementById('apIndicator');
+
+  function nextSection() {
+    if (!autoplay) return;
+    const next = (getActiveIndex() + 1) % sections.length;
+    sections[next].scrollIntoView({ behavior: 'smooth' });
+    scheduleAP();
+  }
+
+  function scheduleAP() {
+    clearTimeout(apTimer);
+    if (autoplay) apTimer = setTimeout(nextSection, AP_DURATION);
+  }
+
+  function pauseAP() {
+    autoplay = false;
+    clearTimeout(apTimer);
+    apInd.classList.add('paused');
+    apInd.innerHTML = '<div class="ap-dot" style="animation:none;opacity:0.3"></div> PAUSED &nbsp;·&nbsp; tap to resume';
+  }
+
+  function resumeAP() {
+    autoplay = true;
+    apInd.classList.remove('paused');
+    apInd.innerHTML = '<div class="ap-dot"></div> AUTO-PLAY &nbsp;·&nbsp; tap to pause';
+    scheduleAP();
+  }
+
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    if (!autoplay) {
+      idleTimer = setTimeout(resumeAP, IDLE_RESUME);
+    }
+  }
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('.nav-dot') || e.target.closest('.btn') || e.target.closest('.fs-btn')) {
+      resetIdle();
+      return;
+    }
+    autoplay ? pauseAP() : resumeAP();
+    resetIdle();
+  });
+
+  document.addEventListener('keydown', e => {
+    resetIdle();
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = Math.min(getActiveIndex() + 1, sections.length - 1);
+      sections[next].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = Math.max(getActiveIndex() - 1, 0);
+      sections[prev].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === ' ') {
+      e.preventDefault();
+      autoplay ? pauseAP() : resumeAP();
+    } else if (e.key === 'f' || e.key === 'F') {
+      toggleFullscreen();
+    }
+  });
+
+  main.addEventListener('wheel', resetIdle, { passive: true });
+  main.addEventListener('touchstart', resetIdle, { passive: true });
+
+  scheduleAP();
+
+  // ===== FULLSCREEN =====
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  // ===== DASHBOARD SIMULATION =====
+  let state = { updates: 247, ewaste: 12.4, osMaj: 4, osMin: 2, osPatch: 7, fw: 8, hw: 5 };
+
+  function addLog(msg, cls = '') {
+    const log = document.getElementById('dashLog');
+    const div = document.createElement('div');
+    div.className = 'log-line ' + cls;
+    div.textContent = `[${new Date().toTimeString().slice(0,8)}] ${msg}`;
+    log.appendChild(div);
+    while (log.children.length > 7) log.removeChild(log.firstChild);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setBar(id, v) {
+    setTimeout(() => { document.getElementById(id).style.width = v + '%'; }, 150);
+  }
+
+  function simulateUpdate() {
+    const btn = document.getElementById('btnUpdate');
+    btn.disabled = true;
+    btn.textContent = 'Updating…';
+
+    state.updates += Math.floor(Math.random() * 10) + 3;
+    state.ewaste = +(state.ewaste + Math.random() * 0.8 + 0.2).toFixed(1);
+    state.osPatch += Math.floor(Math.random() * 5) + 1;
+    state.fw += 1;
+    state.hw += 1;
+
+    addLog('Yphone Core scanning for optimization targets…', 'info');
+    addLog('GPU module: 12% headroom detected — scheduling neuro-optimization', 'info');
+
+    setTimeout(() => {
+      document.getElementById('updateCount').textContent = state.updates;
+      document.getElementById('ewasteSaved').textContent = state.ewaste.toFixed(1);
+      document.getElementById('dashVersion').textContent =
+        `Yphone OS v${state.osMaj}.${state.osMin}.${state.osPatch}`;
+      document.getElementById('aiVer').textContent =
+        'Yphone-NPU v2.' + Math.floor(Math.random() * 9 + 1);
+      document.getElementById('fwVer').textContent = 'Firmware Gen ' + state.fw;
+      document.getElementById('hwVer').textContent = 'Gen ' + state.hw + ' Modular';
+
+      setBar('barAI', 85 + Math.floor(Math.random() * 15));
+      setBar('barFW', 80 + Math.floor(Math.random() * 20));
+      setBar('barHW', 75 + Math.floor(Math.random() * 25));
+
+      addLog('Neural engine updated — inference latency ↓ 18%', 'ok');
+      addLog('Hardware scheduler: new efficiency profile applied', 'ok');
+      addLog('Device health +17%. E-waste prevented: ' + state.ewaste.toFixed(1) + ' kg', 'ok');
+      addLog('Next hardware refresh forecast: Q2 2027', 'info');
+
+      btn.disabled = false;
+      btn.textContent = 'Simulate Yphone Update';
+    }, 1600);
+  }
+
+  function resetDemo() {
+    state = { updates: 247, ewaste: 12.4, osMaj: 4, osMin: 2, osPatch: 7, fw: 8, hw: 5 };
+    document.getElementById('updateCount').textContent = '247';
+    document.getElementById('ewasteSaved').textContent = '12.4';
+    document.getElementById('dashVersion').textContent = 'Yphone OS v4.2.7';
+    document.getElementById('aiVer').textContent = 'Yphone-NPU v2.1';
+    document.getElementById('fwVer').textContent = 'Firmware Gen 8';
+    document.getElementById('hwVer').textContent = 'Gen 5 Modular';
+    document.getElementById('cpuHealth').textContent = '98';
+    setBar('barAI', 88);
+    setBar('barFW', 85);
+    setBar('barHW', 80);
+    document.getElementById('dashLog').innerHTML =
+      '<div class="log-line info">[Yphone] System nominal — all modules healthy</div>';
+    document.getElementById('btnUpdate').disabled = false;
+    document.getElementById('btnUpdate').textContent = 'Simulate Yphone Update';
+  }
+
+  // Init bars
+  setTimeout(() => { setBar('barAI', 88); setBar('barFW', 85); setBar('barHW', 80); }, 400);
+  addLog('Yphone Core self-check complete — all modules nominal', 'info');
+  addLog('Cloud model sync: latest neuro-weights applied', 'ok');
+
+  // ===== QR CODE UPDATE =====
+  // Change the URL below to point to your project page / LinkedIn / GitHub
+  const QR_URL = 'https://uwa.edu.au';
+  document.getElementById('qrImage').src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(QR_URL)}`;
+
+  console.log('%cYphone %c· %cBanana Company %c· %cUWA 2026',
+    'font-weight:700;font-size:18px;', '', 'color:#0071e3;', '', 'color:#86868b;');
+  console.log('Space = pause  |  ← → = navigate  |  F = fullscreen');
+</script>
+
+</body>
+</html>
