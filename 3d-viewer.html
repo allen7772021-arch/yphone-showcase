@@ -3,207 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yphone — 3D Product Viewer</title>
+<title>Yphone — Holographic AI Core</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --accent: #0071e3;
-    --text: #1d1d1f;
-    --text-secondary: #86868b;
+    --cyan: #00d4ff;
+    --cyan-dim: #006680;
+    --white: #e0f0ff;
+    --amber: #ff9500;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-    background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Mono', monospace, sans-serif;
+    background: #000510;
     overflow: hidden;
     height: 100vh;
     -webkit-font-smoothing: antialiased;
     user-select: none;
     -webkit-user-select: none;
+    cursor: grab;
   }
+  body:active { cursor: grabbing; }
+  body.pointing { cursor: pointer; }
 
   canvas { display: block; }
 
   /* ===== TOP BAR ===== */
   .topbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 10;
-    padding: 20px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    padding: 22px 30px;
+    display: flex; justify-content: space-between; align-items: flex-start;
     pointer-events: none;
   }
   .topbar > * { pointer-events: auto; }
 
-  .brand {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  .brand-main {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--white);
+    text-shadow: 0 0 30px rgba(0,212,255,0.5);
   }
-  .brand span { font-weight: 400; color: #a1a1aa; font-size: 14px; margin-left: 8px; }
+  .brand-main .dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--cyan);
+    margin: 0 10px 3px 6px;
+    box-shadow: 0 0 10px var(--cyan);
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 6px var(--cyan); }
+    50% { box-shadow: 0 0 18px var(--cyan), 0 0 30px var(--cyan); }
+  }
+  .brand-sub {
+    font-size: 13px; color: #557788; letter-spacing: 0.15em; font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .status-tag {
+    font-size: 11px; letter-spacing: 0.12em; color: #44ddaa;
+    padding: 8px 16px; border: 1px solid rgba(68,221,170,0.3);
+    border-radius: 20px; background: rgba(68,221,170,0.06);
+    text-shadow: 0 0 8px rgba(68,221,170,0.4);
+  }
 
   /* ===== BOTTOM CONTROLS ===== */
   .controls {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    display: flex;
-    gap: 10px;
-    background: rgba(30,30,30,0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 8px 10px;
-    border: 1px solid rgba(255,255,255,0.1);
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    z-index: 10; display: flex; gap: 8px;
+    background: rgba(8,20,35,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px; padding: 8px 10px;
+    border: 1px solid rgba(0,212,255,0.12);
   }
-
   .ctrl-btn {
-    padding: 10px 18px;
-    border-radius: 18px;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    font-family: inherit;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
+    padding: 10px 16px; border-radius: 18px; border: 1px solid transparent;
+    background: transparent; color: #88aacc;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    transition: all 0.25s ease; font-family: inherit;
+    letter-spacing: 0.02em; white-space: nowrap;
   }
-  .ctrl-btn:hover { background: rgba(255,255,255,0.1); }
+  .ctrl-btn:hover { color: var(--white); background: rgba(0,212,255,0.06); border-color: rgba(0,212,255,0.2); }
   .ctrl-btn.active {
-    background: var(--accent);
-    color: #fff;
+    background: rgba(0,212,255,0.12); color: var(--cyan);
+    border-color: rgba(0,212,255,0.3);
+    box-shadow: 0 0 20px rgba(0,212,255,0.1);
   }
   .ctrl-btn.icon-btn {
-    width: 38px; height: 38px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-size: 16px;
+    width: 38px; height: 38px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: 15px;
   }
-
-  /* ===== INFO OVERLAY ===== */
-  .info-panel {
-    position: fixed;
-    top: 50%;
-    right: 28px;
-    transform: translateY(-50%);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .info-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-  .info-dot:hover, .info-dot.highlight {
-    background: var(--accent);
-    box-shadow: 0 0 12px rgba(0,113,227,0.6);
-    transform: scale(1.3);
-  }
-  .info-dot .tooltip {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(30,30,30,0.9);
-    backdrop-filter: blur(12px);
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-  .info-dot:hover .tooltip { opacity: 1; }
 
   /* ===== HINT ===== */
   .hint {
-    position: fixed;
-    bottom: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 0.04em;
-    pointer-events: none;
-    transition: opacity 0.8s ease;
+    position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+    z-index: 10; font-size: 12px; color: rgba(136,170,204,0.5);
+    letter-spacing: 0.06em; pointer-events: none;
+    transition: opacity 1s ease;
   }
 
   /* ===== LOADING ===== */
   .loading {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.5s ease;
+    position: fixed; inset: 0; z-index: 100; background: #000510;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; transition: opacity 0.6s ease;
   }
   .loading.done { opacity: 0; pointer-events: none; }
-  .loading .loader {
-    width: 32px; height: 32px;
-    border: 2px solid rgba(255,255,255,0.15);
-    border-top-color: #fff;
+  .loading .ring {
+    width: 48px; height: 48px;
+    border: 1.5px solid rgba(0,212,255,0.2);
+    border-top-color: var(--cyan);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 1.2s linear infinite;
+  }
+  .loading span {
+    font-size: 11px; letter-spacing: 0.15em; color: #557788;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* responsive */
   @media (max-width: 600px) {
-    .controls { gap: 4px; padding: 6px 8px; }
-    .ctrl-btn { padding: 8px 12px; font-size: 11px; }
-    .info-panel { right: 8px; }
-    .topbar { padding: 14px 16px; }
-    .brand { font-size: 16px; }
+    .controls { gap: 2px; padding: 5px 6px; }
+    .ctrl-btn { padding: 8px 10px; font-size: 10px; }
+    .topbar { padding: 14px 18px; }
+    .brand-main { font-size: 17px; }
   }
 </style>
 </head>
 <body>
 
-<div class="loading" id="loading"><div class="loader"></div></div>
+<div class="loading" id="loading">
+  <div class="ring"></div>
+  <span>INITIALIZING YPHONE CORE</span>
+</div>
 
 <div class="topbar">
-  <div class="brand">Yphone <span>Banana Company</span></div>
+  <div>
+    <div class="brand-main">YPHONE<span class="dot"></span>CORE</div>
+    <div class="brand-sub">BANANA COMPANY · HOLOGRAPHIC AI SYSTEM</div>
+  </div>
+  <div class="status-tag">● SYSTEM ACTIVE</div>
 </div>
 
-<div class="hint" id="hint">Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
-
-<div class="info-panel" id="infoPanel">
-  <div class="info-dot" data-module="ai"><span class="tooltip">Yphone AI Core</span></div>
-  <div class="info-dot" data-module="cpu"><span class="tooltip">CPU Module</span></div>
-  <div class="info-dot" data-module="gpu"><span class="tooltip">GPU Module</span></div>
-  <div class="info-dot" data-module="battery"><span class="tooltip">Battery Pack</span></div>
-</div>
+<div class="hint" id="hint">DRAG TO ORBIT &nbsp;·&nbsp; SCROLL TO APPROACH &nbsp;·&nbsp; CLICK PANELS</div>
 
 <div class="controls" id="controls">
-  <button class="ctrl-btn active" id="btnAutoRotate" onclick="toggleAutoRotate()">⟳ Auto Rotate</button>
-  <button class="ctrl-btn" id="btnExplode" onclick="toggleExplode()">🔩 Explode View</button>
-  <button class="ctrl-btn" id="btnBackPanel" onclick="toggleBackPanel()">◈ Back Off</button>
-  <button class="ctrl-btn icon-btn" onclick="resetView()" title="Reset view">↺</button>
-  <button class="ctrl-btn icon-btn" onclick="captureScreenshot()" title="Screenshot">📷</button>
+  <button class="ctrl-btn active" id="btnAutoRotate" onclick="toggleAutoRotate()">⟳ ORBIT</button>
+  <button class="ctrl-btn" id="btnExplode" onclick="toggleExplode()">◈ EXPLODE</button>
+  <button class="ctrl-btn" id="btnPanels" onclick="togglePanels()">⊞ PANELS</button>
+  <button class="ctrl-btn icon-btn" onclick="resetView()" title="Reset">↺</button>
+  <button class="ctrl-btn icon-btn" onclick="captureScreenshot()" title="Capture">◎</button>
 </div>
 
 <script type="importmap">
@@ -219,205 +167,229 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// ===== SCENE SETUP =====
+// ===== SCENE =====
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000510);
+scene.fog = new THREE.FogExp2(0x000510, 0.00015);
 
-// Background gradient (simulated with scene background + fog)
-scene.background = new THREE.Color(0x0a0a0c);
-scene.fog = new THREE.Fog(0x0a0a0c, 8, 30);
-
-const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.5, 50);
-camera.position.set(4.5, 1.8, 8);
-camera.lookAt(0, 0, 0);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.3, 60);
+camera.position.set(5, 3.5, 10);
+camera.lookAt(0, 0.5, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
+renderer.toneMappingExposure = 1.3;
 document.body.appendChild(renderer.domElement);
 
 // ===== ORBIT CONTROLS =====
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.08;
+controls.dampingFactor = 0.06;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 0.6;
-controls.minDistance = 4;
-controls.maxDistance = 14;
-controls.maxPolarAngle = Math.PI * 0.75;
-controls.target.set(0, 0.1, 0);
+controls.autoRotateSpeed = 0.4;
+controls.minDistance = 3;
+controls.maxDistance = 18;
+controls.maxPolarAngle = Math.PI * 0.7;
+controls.target.set(0, 0.5, 0);
 controls.update();
 
-// Hide hint after first interaction
+// Hide hint on drag
 let hintHidden = false;
 renderer.domElement.addEventListener('pointerdown', () => {
-  if (!hintHidden) {
-    document.getElementById('hint').style.opacity = '0';
-    hintHidden = true;
-  }
+  if (!hintHidden) { document.getElementById('hint').style.opacity = '0'; hintHidden = true; }
 });
 
-// ===== LIGHTING (Apple-style 3-point + accent) =====
-// Key light
-const keyLight = new THREE.DirectionalLight(0xffffff, 4);
-keyLight.position.set(5, 6, 8);
-keyLight.castShadow = true;
-keyLight.shadow.mapSize.width = 2048;
-keyLight.shadow.mapSize.height = 2048;
-keyLight.shadow.camera.near = 0.5;
-keyLight.shadow.camera.far = 50;
-keyLight.shadow.camera.left = -8;
-keyLight.shadow.camera.right = 8;
-keyLight.shadow.camera.top = 8;
-keyLight.shadow.camera.bottom = -8;
-keyLight.shadow.bias = -0.0001;
+// ===== LIGHTING =====
+const ambientLight = new THREE.AmbientLight(0x112244, 0.5);
+scene.add(ambientLight);
+
+const keyLight = new THREE.DirectionalLight(0xccddff, 2.5);
+keyLight.position.set(8, 10, 6);
 scene.add(keyLight);
 
-// Fill light
-const fillLight = new THREE.DirectionalLight(0x8899cc, 1.2);
-fillLight.position.set(-3, 2, -1);
-scene.add(fillLight);
+const accentLight = new THREE.PointLight(0x00aacc, 8, 12);
+accentLight.position.set(0, 1.5, 0);
+scene.add(accentLight);
 
-// Rim light (back edge highlight)
-const rimLight = new THREE.DirectionalLight(0xffffff, 3);
-rimLight.position.set(0, 1, -6);
+const rimLight = new THREE.PointLight(0x004466, 4, 10);
+rimLight.position.set(-4, -1, -6);
 scene.add(rimLight);
 
-// Bottom bounce
-const bounceLight = new THREE.DirectionalLight(0x4466aa, 0.8);
-bounceLight.position.set(0, -2, 3);
-scene.add(bounceLight);
+// ===== HELPER: Canvas Texture for Holographic Panels =====
+function createPanelTexture(title, lines, width = 512, height = 256) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
 
-// Ambient
-const ambient = new THREE.AmbientLight(0x334466, 0.6);
-scene.add(ambient);
+  // Background
+  ctx.fillStyle = 'rgba(0,10,25,0.85)';
+  ctx.fillRect(0, 0, width, height);
 
-// ===== FLOOR (subtle reflection platform) =====
-const floorGeo = new THREE.PlaneGeometry(20, 20);
-const floorMat = new THREE.MeshStandardMaterial({
-  color: 0x111118,
-  roughness: 0.4,
-  metalness: 0.3,
+  // Border
+  ctx.strokeStyle = 'rgba(0,180,220,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(4, 4, width - 8, height - 8);
+
+  // Corner accents
+  const cs = 20;
+  ctx.strokeStyle = 'rgba(0,212,255,0.8)';
+  ctx.lineWidth = 2;
+  // TL
+  ctx.beginPath(); ctx.moveTo(4, 4 + cs); ctx.lineTo(4, 4); ctx.lineTo(4 + cs, 4); ctx.stroke();
+  // TR
+  ctx.beginPath(); ctx.moveTo(width - 4 - cs, 4); ctx.lineTo(width - 4, 4); ctx.lineTo(width - 4, 4 + cs); ctx.stroke();
+  // BL
+  ctx.beginPath(); ctx.moveTo(4, height - 4 - cs); ctx.lineTo(4, height - 4); ctx.lineTo(4 + cs, height - 4); ctx.stroke();
+  // BR
+  ctx.beginPath(); ctx.moveTo(width - 4 - cs, height - 4); ctx.lineTo(width - 4, height - 4); ctx.lineTo(width - 4, height - 4 - cs); ctx.stroke();
+
+  // Title
+  ctx.fillStyle = '#00d4ff';
+  ctx.font = '600 14px "SF Mono", "Cascadia Code", monospace';
+  ctx.fillText(title, 20, 36);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(0,180,220,0.3)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(20, 46); ctx.lineTo(width - 20, 46); ctx.stroke();
+
+  // Lines
+  ctx.fillStyle = '#88bbcc';
+  ctx.font = '11px "SF Mono", "Cascadia Code", monospace';
+  lines.forEach((line, i) => {
+    if (line.startsWith('>')) {
+      ctx.fillStyle = '#00d4ff';
+      ctx.fillText(line, 20, 68 + i * 22);
+      ctx.fillStyle = '#88bbcc';
+    } else if (line.startsWith('✓')) {
+      ctx.fillStyle = '#44ddaa';
+      ctx.fillText(line, 20, 68 + i * 22);
+      ctx.fillStyle = '#88bbcc';
+    } else {
+      ctx.fillText(line, 20, 68 + i * 22);
+    }
+  });
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+}
+
+// Update panel texture dynamically
+function updatePanelTexture(mesh, title, lines) {
+  const tex = createPanelTexture(title, lines);
+  mesh.material.map?.dispose();
+  mesh.material.map = tex;
+  mesh.material.needsUpdate = true;
+}
+
+// ===== SCENE ELEMENTS =====
+
+// -- Circular Grid Floor --
+const gridHelper = new THREE.PolarGridHelper(7, 64, 40, 64, 0x002233, 0x001522);
+gridHelper.position.y = -3.5;
+scene.add(gridHelper);
+
+// Fine inner grid
+const innerGrid = new THREE.PolarGridHelper(3, 48, 24, 64, 0x003344, 0x001a2a);
+innerGrid.position.y = -3.49;
+scene.add(innerGrid);
+
+// ===== CENTRAL AI CORE =====
+const coreGroup = new THREE.Group();
+scene.add(coreGroup);
+
+// -- Main wireframe sphere (icosahedron detail 3) --
+const coreWireGeo = new THREE.IcosahedronGeometry(1.1, 3);
+const coreWire = new THREE.LineSegments(
+  new THREE.EdgesGeometry(coreWireGeo),
+  new THREE.LineBasicMaterial({ color: 0x00aacc, transparent: true, opacity: 0.5, depthWrite: false })
+);
+coreGroup.add(coreWire);
+
+// -- Inner detailed wireframe --
+const coreInnerGeo = new THREE.IcosahedronGeometry(0.65, 2);
+const coreInner = new THREE.LineSegments(
+  new THREE.EdgesGeometry(coreInnerGeo),
+  new THREE.LineBasicMaterial({ color: 0x00ddff, transparent: true, opacity: 0.6, depthWrite: false })
+);
+coreGroup.add(coreInner);
+
+// -- Solid glowing center --
+const coreSolidGeo = new THREE.SphereGeometry(0.25, 32, 32);
+const coreSolidMat = new THREE.MeshBasicMaterial({ color: 0x44ccff, transparent: true, opacity: 0.7, depthWrite: false });
+const coreSolid = new THREE.Mesh(coreSolidGeo, coreSolidMat);
+coreGroup.add(coreSolid);
+
+// -- Inner glow halo --
+const coreHaloGeo = new THREE.SphereGeometry(0.45, 32, 32);
+const coreHaloMat = new THREE.MeshBasicMaterial({ color: 0x0088cc, transparent: true, opacity: 0.15, depthWrite: false });
+const coreHalo = new THREE.Mesh(coreHaloGeo, coreHaloMat);
+coreGroup.add(coreHalo);
+
+// -- Energy pulse rings (3) --
+const pulseRings = [];
+for (let i = 0; i < 3; i++) {
+  const ringGeo = new THREE.TorusGeometry(0.8 + i * 0.5, 0.015, 16, 80);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.6 - i * 0.15, depthWrite: false });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2 + i * 0.5;
+  ring.rotation.y = i * 0.6;
+  ring.userData = { baseScale: 1, phase: i * 2.1 };
+  coreGroup.add(ring);
+  pulseRings.push(ring);
+}
+
+// ===== ORBITAL RING SYSTEM =====
+const orbitalRings = [];
+const ringDefs = [
+  { radius: 2.0, tilt: Math.PI * 0.08, speed: 0.25, color: 0x007799, opacity: 0.4, pts: 180 },
+  { radius: 2.3, tilt: Math.PI * 0.48, speed: -0.3, color: 0x0088aa, opacity: 0.35, pts: 200 },
+  { radius: 2.6, tilt: Math.PI * 0.85, speed: 0.35, color: 0x006688, opacity: 0.3, pts: 220 },
+  { radius: 1.7, tilt: Math.PI * 0.30, speed: -0.45, color: 0x0099bb, opacity: 0.45, pts: 150 },
+];
+
+ringDefs.forEach(def => {
+  const ringGroup = new THREE.Group();
+  ringGroup.rotation.x = def.tilt;
+
+  // Main ring
+  const ringGeo = new THREE.TorusGeometry(def.radius, 0.012, 8, def.pts);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: def.color, transparent: true, opacity: def.opacity, depthWrite: false
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ringGroup.add(ring);
+
+  // Dots along ring
+  const dotCount = 40;
+  const dotGeo = new THREE.SphereGeometry(0.03, 4, 4);
+  const dotMat = new THREE.MeshBasicMaterial({ color: 0x44ddff, transparent: true, opacity: 0.8, depthWrite: false });
+  const dots = [];
+  for (let i = 0; i < dotCount; i++) {
+    const angle = (i / dotCount) * Math.PI * 2;
+    const dot = new THREE.Mesh(dotGeo, dotMat);
+    dot.position.set(Math.cos(angle) * def.radius, 0, Math.sin(angle) * def.radius);
+    dot.userData = { angle, radius: def.radius, speed: def.speed * (0.8 + Math.random() * 0.4) };
+    ringGroup.add(dot);
+    dots.push(dot);
+  }
+
+  scene.add(ringGroup);
+  orbitalRings.push({ group: ringGroup, dots, def });
 });
-const floor = new THREE.Mesh(floorGeo, floorMat);
-floor.rotation.x = -Math.PI / 2;
-floor.position.y = -5;
-floor.receiveShadow = true;
-scene.add(floor);
 
-// Studio backdrop (curved)
-const backdropGeo = new THREE.CylinderGeometry(6, 6, 8, 64, 1, true);
-const backdropMat = new THREE.MeshStandardMaterial({
-  color: 0x1a1a22,
-  roughness: 0.9,
-  metalness: 0,
-  side: THREE.BackSide,
-});
-const backdrop = new THREE.Mesh(backdropGeo, backdropMat);
-backdrop.position.y = 0.5;
-backdrop.receiveShadow = true;
-scene.add(backdrop);
+// ===== HOLOGRAPHIC YPHONE =====
+const hologramGroup = new THREE.Group();
+hologramGroup.position.set(2.2, 0.6, -1.5);
+hologramGroup.rotation.set(0.2, -0.3, 0.1);
+scene.add(hologramGroup);
 
-// ===== MATERIALS =====
-// Titanium frame
-const titaniumMat = new THREE.MeshStandardMaterial({
-  color: 0xd4d0c8,
-  roughness: 0.3,
-  metalness: 0.9,
-});
-
-// Dark titanium (sides)
-const darkTitaniumMat = new THREE.MeshStandardMaterial({
-  color: 0x8a8780,
-  roughness: 0.35,
-  metalness: 0.85,
-});
-
-// Glass front
-const glassMat = new THREE.MeshPhysicalMaterial({
-  color: 0x0a0a0a,
-  roughness: 0.1,
-  metalness: 0.05,
-  clearcoat: 0.3,
-  clearcoatRoughness: 0.1,
-});
-
-// Screen
-const screenMat = new THREE.MeshStandardMaterial({
-  color: 0x111118,
-  roughness: 0.05,
-  metalness: 0.02,
-});
-
-// Back panel (aluminum)
-const backPanelMat = new THREE.MeshStandardMaterial({
-  color: 0xe8e4dc,
-  roughness: 0.35,
-  metalness: 0.6,
-});
-
-// Internal base (dark)
-const internalBaseMat = new THREE.MeshStandardMaterial({
-  color: 0x1a1a1e,
-  roughness: 0.5,
-  metalness: 0.4,
-});
-
-// AI Core
-const aiCoreMat = new THREE.MeshStandardMaterial({
-  color: 0x0088ff,
-  roughness: 0.1,
-  metalness: 0.1,
-  emissive: 0x0055cc,
-  emissiveIntensity: 1.5,
-});
-
-// AI Core glow
-const aiGlowMat = new THREE.MeshBasicMaterial({
-  color: 0x3399ff,
-  transparent: true,
-  opacity: 0.3,
-  depthWrite: false,
-});
-
-// Modules
-const cpuMat = new THREE.MeshStandardMaterial({
-  color: 0x2c2c30,
-  roughness: 0.3,
-  metalness: 0.7,
-});
-
-const gpuMat = new THREE.MeshStandardMaterial({
-  color: 0x3a3040,
-  roughness: 0.3,
-  metalness: 0.65,
-});
-
-const batteryMat = new THREE.MeshStandardMaterial({
-  color: 0x2a2a2e,
-  roughness: 0.4,
-  metalness: 0.5,
-});
-
-const sensorMat = new THREE.MeshStandardMaterial({
-  color: 0x252528,
-  roughness: 0.25,
-  metalness: 0.7,
-});
-
-// ===== BUILD YPHONE MODEL =====
-
-const phoneGroup = new THREE.Group();
-const bodyGroup = new THREE.Group();
-const internalGroup = new THREE.Group();
-scene.add(phoneGroup);
-phoneGroup.add(bodyGroup);
-phoneGroup.add(internalGroup);
-
-// -- Phone body (rounded rectangle via ExtrudeGeometry) --
+// Phone body wireframe
 function createRoundedRectShape(w, h, r) {
   const shape = new THREE.Shape();
   shape.moveTo(-w + r, -h);
@@ -432,239 +404,216 @@ function createRoundedRectShape(w, h, r) {
   return shape;
 }
 
-// Phone dimensions
-const PW = 1.55;  // half-width
-const PH = 3.15;  // half-height
-const PD = 0.15;  // half-depth
-const CR = 0.35;  // corner radius
-
-// Main body shape
-const bodyShape = createRoundedRectShape(PW, PH, CR);
-const extrudeSettings = { steps: 1, depth: PD * 2, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 3 };
-const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, extrudeSettings);
-bodyGeo.translate(0, 0, -PD);
-const bodyMesh = new THREE.Mesh(bodyGeo, titaniumMat);
-bodyMesh.castShadow = true;
-bodyMesh.receiveShadow = true;
-bodyGroup.add(bodyMesh);
-
-// Front glass (slightly recessed)
-const glassShape = createRoundedRectShape(PW - 0.06, PH - 0.06, CR - 0.04);
-const glassGeo = new THREE.ExtrudeGeometry(glassShape, { steps: 1, depth: 0.02, bevelEnabled: false });
-glassGeo.translate(0, 0, PD - 0.015);
-const glassMesh = new THREE.Mesh(glassGeo, glassMat);
-bodyGroup.add(glassMesh);
-
-// Screen display area
-const screenShape = createRoundedRectShape(PW - 0.25, PH - 0.55, CR * 0.6);
-const screenGeo = new THREE.ShapeGeometry(screenShape);
-const screenMesh = new THREE.Mesh(screenGeo, screenMat);
-screenMesh.position.z = PD + 0.002;
-bodyGroup.add(screenMesh);
-
-// Camera notch / Dynamic Island
-const notchGeo = new THREE.CapsuleGeometry(0.14, 0.25, 4, 8);
-const notchMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.05 });
-const notch = new THREE.Mesh(notchGeo, notchMat);
-notch.position.set(0, PH - 0.65, PD + 0.003);
-bodyGroup.add(notch);
-
-// Back panel (removable)
-const backShape = createRoundedRectShape(PW - 0.08, PH - 0.08, CR - 0.06);
-const backGeo = new THREE.ExtrudeGeometry(backShape, { steps: 1, depth: 0.04, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 });
-backGeo.translate(0, 0, -PD - 0.02);
-const backPanel = new THREE.Mesh(backGeo, backPanelMat);
-backPanel.castShadow = true;
-backPanel.name = 'backPanel';
-bodyGroup.add(backPanel);
-
-// Apple logo placeholder (small circle on back)
-const logoGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.005, 32);
-const logoMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.2, metalness: 0.8 });
-const logo = new THREE.Mesh(logoGeo, logoMat);
-logo.position.z = -PD - 0.04;
-logo.rotation.x = Math.PI / 2;
-bodyGroup.add(logo);
-
-// ===== INTERNAL COMPONENTS (hidden under back panel) =====
-
-// Internal base plate
-const basePlateGeo = new THREE.ExtrudeGeometry(
-  createRoundedRectShape(PW - 0.15, PH - 0.15, CR - 0.1),
-  { steps: 1, depth: 0.03, bevelEnabled: false }
-);
-basePlateGeo.translate(0, 0, -PD + 0.01);
-const basePlate = new THREE.Mesh(basePlateGeo, internalBaseMat);
-internalGroup.add(basePlate);
-
-// -- AI Core (center, slightly above center of phone) --
-const aiCoreGroup = new THREE.Group();
-aiCoreGroup.position.set(0, 0.3, -0.08);
-aiCoreGroup.name = 'aiCore';
-
-// Core sphere
-const coreGeo = new THREE.IcosahedronGeometry(0.16, 2);
-const coreMesh = new THREE.Mesh(coreGeo, aiCoreMat);
-aiCoreGroup.add(coreMesh);
-
-// Glow halo (larger transparent sphere)
-const glowGeo = new THREE.SphereGeometry(0.27, 32, 32);
-const glowMesh = new THREE.Mesh(glowGeo, aiGlowMat);
-aiCoreGroup.add(glowMesh);
-
-// Outer ring
-const ringGeo = new THREE.TorusGeometry(0.22, 0.02, 16, 48);
-const ringMat = new THREE.MeshStandardMaterial({
-  color: 0x3399ff,
-  roughness: 0.2,
-  metalness: 0.3,
-  emissive: 0x1155aa,
-  emissiveIntensity: 0.8,
+const PW = 0.9, PH = 1.9, PD = 0.1, CR = 0.2;
+const phoneShape = createRoundedRectShape(PW, PH, CR);
+const phoneExtGeo = new THREE.ExtrudeGeometry(phoneShape, {
+  steps: 1, depth: PD * 2,
+  bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 2
 });
-const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-aiCoreGroup.add(ringMesh);
+phoneExtGeo.translate(0, 0, -PD);
 
-// Second ring (angled)
-const ring2 = new THREE.Mesh(
-  new THREE.TorusGeometry(0.24, 0.015, 16, 48),
-  ringMat
+// Wireframe body
+const phoneWire = new THREE.LineSegments(
+  new THREE.EdgesGeometry(phoneExtGeo, 15),
+  new THREE.LineBasicMaterial({ color: 0x44ccdd, transparent: true, opacity: 0.7, depthWrite: false })
 );
-ring2.rotation.x = Math.PI / 2;
-aiCoreGroup.add(ring2);
+hologramGroup.add(phoneWire);
 
-internalGroup.add(aiCoreGroup);
+// Transparent faces
+const phoneFaceMat = new THREE.MeshBasicMaterial({
+  color: 0x003344, transparent: true, opacity: 0.08, depthWrite: false, side: THREE.DoubleSide
+});
+const phoneFace = new THREE.Mesh(phoneExtGeo, phoneFaceMat);
+hologramGroup.add(phoneFace);
 
-// -- CPU Module --
-const cpuGroup = new THREE.Group();
-cpuGroup.position.set(0.6, 0.3, -0.08);
-cpuGroup.name = 'cpuModule';
-const cpuBlock = new THREE.Mesh(
-  new THREE.BoxGeometry(0.35, 0.5, 0.06, 2, 2, 2),
-  cpuMat
-);
-cpuGroup.add(cpuBlock);
-// CPU detail lines
-const cpuDetailGeo = new THREE.BoxGeometry(0.28, 0.06, 0.065, 1, 1, 1);
-const cpuDetail = new THREE.Mesh(cpuDetailGeo, new THREE.MeshStandardMaterial({
-  color: 0x444448, roughness: 0.2, metalness: 0.8
-}));
-cpuDetail.position.y = -0.1;
-cpuGroup.add(cpuDetail);
-internalGroup.add(cpuGroup);
+// Internal modules (outlined)
+const moduleDefs = [
+  { x: 0, y: 0.3, w: 0.35, h: 0.4, d: 0.06, color: 0x44ddff, label: 'AI' },
+  { x: 0.35, y: 0.25, w: 0.25, h: 0.35, d: 0.05, color: 0x66aacc, label: 'CPU' },
+  { x: -0.3, y: 0.3, w: 0.28, h: 0.3, d: 0.05, color: 0x8866cc, label: 'GPU' },
+  { x: 0, y: -1.2, w: 0.55, h: 0.65, d: 0.04, color: 0x55aa88, label: 'BAT' },
+];
+const holoModules = [];
 
-// -- GPU Module --
-const gpuGroup = new THREE.Group();
-gpuGroup.position.set(-0.55, 0.35, -0.08);
-gpuGroup.name = 'gpuModule';
-const gpuBlock = new THREE.Mesh(
-  new THREE.BoxGeometry(0.4, 0.45, 0.06, 2, 2, 2),
-  gpuMat
-);
-gpuGroup.add(gpuBlock);
-// GPU accent stripe
-const gpuStripe = new THREE.Mesh(
-  new THREE.BoxGeometry(0.34, 0.04, 0.065, 1, 1, 1),
-  new THREE.MeshStandardMaterial({ color: 0x665577, roughness: 0.15, metalness: 0.7, emissive: 0x110022, emissiveIntensity: 0.4 })
-);
-gpuStripe.position.y = 0.1;
-gpuGroup.add(gpuStripe);
-internalGroup.add(gpuGroup);
+moduleDefs.forEach(def => {
+  const modGroup = new THREE.Group();
+  modGroup.position.set(def.x, def.y, 0);
+  modGroup.userData = { ...def };
 
-// -- Battery --
-const batteryGroup = new THREE.Group();
-batteryGroup.position.set(0, -1.4, -0.07);
-batteryGroup.name = 'batteryModule';
-const batteryBlock = new THREE.Mesh(
-  new THREE.BoxGeometry(1.1, 1.0, 0.05, 3, 3, 2),
-  batteryMat
-);
-batteryGroup.add(batteryBlock);
-// Battery cell lines
-for (let i = -1; i <= 1; i += 2) {
-  const cellLine = new THREE.Mesh(
-    new THREE.BoxGeometry(0.02, 0.85, 0.055, 1, 1, 1),
-    new THREE.MeshStandardMaterial({ color: 0x3a3a40, roughness: 0.3, metalness: 0.6 })
+  const boxGeo = new THREE.BoxGeometry(def.w, def.h, def.d);
+  const boxWire = new THREE.LineSegments(
+    new THREE.EdgesGeometry(boxGeo),
+    new THREE.LineBasicMaterial({ color: def.color, transparent: true, opacity: 0.65, depthWrite: false })
   );
-  cellLine.position.x = i * 0.3;
-  batteryGroup.add(cellLine);
-}
-internalGroup.add(batteryGroup);
+  modGroup.add(boxWire);
 
-// -- Sensor / Connectivity module --
-const sensorGroup = new THREE.Group();
-sensorGroup.position.set(0, -2.1, -0.07);
-sensorGroup.name = 'sensorModule';
-const sensorBlock = new THREE.Mesh(
-  new THREE.BoxGeometry(0.6, 0.3, 0.04, 2, 1, 2),
-  sensorMat
+  // Glow face
+  const faceMat = new THREE.MeshBasicMaterial({
+    color: def.color, transparent: true, opacity: 0.06, depthWrite: false, side: THREE.DoubleSide
+  });
+  modGroup.add(new THREE.Mesh(boxGeo, faceMat));
+
+  hologramGroup.add(modGroup);
+  holoModules.push(modGroup);
+});
+
+// ===== FLOATING DATA PANELS =====
+const panels = [];
+const panelDefs = [
+  {
+    pos: [-3.2, 1.8, -1.5], rot: [0, 0.5, 0],
+    title: 'SYSTEM STATUS',
+    lines: ['> Yphone OS v4.2.7', '> Uptime: 847d 13h', '✓ All modules nominal', '✓ AI Core: ACTIVE', '  Load: 23%', '  Memory: 6.2/12 TB']
+  },
+  {
+    pos: [-2.8, -0.6, -2.5], rot: [0.1, 0.7, 0.05],
+    title: 'MODULE HEALTH',
+    lines: ['> CPU Gen 8  : ██████ 98%', '> GPU Gen 7  : █████░ 91%', '> AI NPU v2.1: ██████ 100%', '> Battery    : ████░░ 82%', '✓ Predicted life: 12.4 yr', '  Next refresh: 2027-Q2']
+  },
+  {
+    pos: [3.0, 1.6, -2.0], rot: [0, -0.5, -0.05],
+    title: 'E-WASTE PREVENTION',
+    lines: ['> Device lifetime: 4.2 yr', '> Prevented waste: 18.7 kg', '> CO₂ avoided: 142 kg', '✓ Modules recycled: 6', '✓ Circular index: 94%', '> Path to zero: ON TRACK']
+  },
+  {
+    pos: [3.2, -0.4, -2.8], rot: [0.1, -0.6, 0],
+    title: 'LIVE UPDATE FEED',
+    lines: ['> [14:32] GPU optimizer v3', '✓ [14:28] Security patch', '> [14:15] Battery profile', '✓ [13:58] AI model sync', '  [13:42] Sensor calib.', '  [13:30] Network opt.']
+  },
+];
+
+panelDefs.forEach(def => {
+  const tex = createPanelTexture(def.title, def.lines);
+  const panelGeo = new THREE.PlaneGeometry(2.2, 1.1);
+  const panelMat = new THREE.MeshBasicMaterial({
+    map: tex, transparent: true, depthWrite: false, side: THREE.DoubleSide
+  });
+  const panel = new THREE.Mesh(panelGeo, panelMat);
+  panel.position.set(...def.pos);
+  panel.rotation.set(...def.rot);
+  panel.userData = { ...def };
+  scene.add(panel);
+  panels.push(panel);
+});
+
+// ===== CONNECTION LINES (core to panels) =====
+const connectionLines = [];
+panels.forEach(panel => {
+  const points = [
+    new THREE.Vector3(0, 0.5, 0), // core position
+    panel.position.clone()
+  ];
+  const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0x005566, transparent: true, opacity: 0.25, depthWrite: false
+  });
+  const line = new THREE.Line(lineGeo, lineMat);
+  scene.add(line);
+  connectionLines.push({ line, panel });
+});
+
+// Core to hologram connection
+const holoLinePoints = [
+  new THREE.Vector3(0, 0.5, 0),
+  hologramGroup.position.clone()
+];
+const holoLineGeo = new THREE.BufferGeometry().setFromPoints(holoLinePoints);
+const holoLine = new THREE.Line(holoLineGeo,
+  new THREE.LineBasicMaterial({ color: 0x006677, transparent: true, opacity: 0.3, depthWrite: false })
 );
-sensorGroup.add(sensorBlock);
-// Tiny sensor dots
-for (let x = -0.18; x <= 0.18; x += 0.12) {
-  const dot = new THREE.Mesh(
-    new THREE.SphereGeometry(0.04, 8, 8),
-    new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1 })
-  );
-  dot.position.set(x, 0, 0.025);
-  sensorGroup.add(dot);
+scene.add(holoLine);
+
+// ===== PARTICLE SYSTEMS =====
+
+// -- Ambient floating particles --
+const ambientParticleCount = 200;
+const ambientGeo = new THREE.BufferGeometry();
+const ambientPositions = new Float32Array(ambientParticleCount * 3);
+const ambientSizes = new Float32Array(ambientParticleCount);
+
+for (let i = 0; i < ambientParticleCount; i++) {
+  ambientPositions[i * 3] = (Math.random() - 0.5) * 14;
+  ambientPositions[i * 3 + 1] = (Math.random() - 0.5) * 8;
+  ambientPositions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+  ambientSizes[i] = Math.random() * 2 + 0.5;
 }
-internalGroup.add(sensorGroup);
+ambientGeo.setAttribute('position', new THREE.BufferAttribute(ambientPositions, 3));
+ambientGeo.setAttribute('size', new THREE.BufferAttribute(ambientSizes, 1));
 
-// ===== PARTICLE SYSTEM (around AI core) =====
-const particlesGroup = new THREE.Group();
-particlesGroup.position.copy(aiCoreGroup.position);
-const particleCount = 60;
-const particleGeo = new THREE.SphereGeometry(0.015, 4, 4);
-const particleMat = new THREE.MeshBasicMaterial({ color: 0x66bbff, transparent: true, opacity: 0.7, depthWrite: false });
+const ambientMat = new THREE.PointsMaterial({
+  color: 0x3388aa, size: 0.02, transparent: true,
+  opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending
+});
+const ambientParticles = new THREE.Points(ambientGeo, ambientMat);
+scene.add(ambientParticles);
 
-const particles = [];
-for (let i = 0; i < particleCount; i++) {
-  const particle = new THREE.Mesh(particleGeo, particleMat);
-  // Random position on a sphere shell
+// -- Core orbiting particles --
+const coreParticleCount = 120;
+const corePartGeo = new THREE.BufferGeometry();
+const corePartPositions = new Float32Array(coreParticleCount * 3);
+const corePartData = [];
+
+for (let i = 0; i < coreParticleCount; i++) {
   const theta = Math.random() * Math.PI * 2;
   const phi = Math.acos(2 * Math.random() - 1);
-  const radius = 0.35 + Math.random() * 0.6;
-  particle.position.set(
-    radius * Math.sin(phi) * Math.cos(theta),
-    radius * Math.sin(phi) * Math.sin(theta),
-    radius * Math.cos(phi)
-  );
-  particle.userData = {
-    baseRadius: radius,
-    theta,
-    phi,
-    speed: 0.3 + Math.random() * 0.8,
+  const radius = 1.3 + Math.random() * 1.8;
+  corePartPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+  corePartPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+  corePartPositions[i * 3 + 2] = radius * Math.cos(phi);
+  corePartData.push({
+    theta, phi, radius,
+    speed: 0.3 + Math.random() * 0.7,
     offset: Math.random() * Math.PI * 2,
-  };
-  particlesGroup.add(particle);
-  particles.push(particle);
+    ySpeed: (Math.random() - 0.5) * 0.4,
+  });
 }
-internalGroup.add(particlesGroup);
+corePartGeo.setAttribute('position', new THREE.BufferAttribute(corePartPositions, 3));
 
-// AI core point light
-const aiPointLight = new THREE.PointLight(0x3399ff, 2, 1.5, 2);
-aiPointLight.position.copy(aiCoreGroup.position);
-internalGroup.add(aiPointLight);
+const corePartMat = new THREE.PointsMaterial({
+  color: 0x44ccff, size: 0.03, transparent: true,
+  opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending
+});
+const coreParticles = new THREE.Points(corePartGeo, corePartMat);
+coreGroup.add(coreParticles);
+
+// -- Data stream particles (on orbital rings) --
+const streamParticles = [];
+ringDefs.forEach(def => {
+  const count = 60;
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const data = [];
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2;
+    positions[i * 3] = Math.cos(angle) * def.radius;
+    positions[i * 3 + 1] = 0;
+    positions[i * 3 + 2] = Math.sin(angle) * def.radius;
+    data.push({ angle, radius: def.radius, speed: def.speed * 2 });
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({
+    color: 0x66eeff, size: 0.035, transparent: true,
+    opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  const pts = new THREE.Points(geo, mat);
+
+  // Find the corresponding ring group
+  const ringGroup = orbitalRings.find(r => r.def.radius === def.radius);
+  if (ringGroup) {
+    ringGroup.group.add(pts);
+    streamParticles.push({ points: pts, data, group: ringGroup.group });
+  }
+});
 
 // ===== STATE =====
 let exploded = false;
-let backPanelOff = false;
-const explodeTargets = {
-  aiCore: new THREE.Vector3(0, 0.3, -0.5),
-  cpuModule: new THREE.Vector3(0.6, 0.3, -0.55),
-  gpuModule: new THREE.Vector3(-0.55, 0.35, -0.55),
-  batteryModule: new THREE.Vector3(0, -1.4, -0.5),
-  sensorModule: new THREE.Vector3(0, -2.1, -0.5),
-};
-const explodeOriginals = {
-  aiCore: new THREE.Vector3(0, 0.3, -0.08),
-  cpuModule: new THREE.Vector3(0.6, 0.3, -0.08),
-  gpuModule: new THREE.Vector3(-0.55, 0.35, -0.08),
-  batteryModule: new THREE.Vector3(0, -1.4, -0.07),
-  sensorModule: new THREE.Vector3(0, -2.1, -0.07),
-};
-const backPanelOriginal = new THREE.Vector3(0, 0, 0);
-const backPanelOffTarget = new THREE.Vector3(0, -2.5, -1.2);
+let panelsVisible = true;
+
+// Store original module positions
+holoModules.forEach(m => {
+  m.userData.originalPos = m.position.clone();
+  m.userData.explodePos = m.position.clone().multiplyScalar(2.2);
+});
 
 // ===== ANIMATION LOOP =====
 const clock = new THREE.Clock();
@@ -677,55 +626,117 @@ function animate() {
 
   controls.update();
 
-  // Pulse AI core
-  const pulse = 1 + Math.sin(t * 2.5) * 0.15;
-  aiCoreGroup.children.forEach(c => {
-    if (c.geometry && c.geometry.type === 'IcosahedronGeometry') {
-      c.scale.setScalar(pulse);
+  // === CORE ANIMATIONS ===
+  // Rotate wireframe
+  coreWire.rotation.y += dt * 0.25;
+  coreWire.rotation.x += dt * 0.12;
+  coreInner.rotation.y -= dt * 0.35;
+  coreInner.rotation.z += dt * 0.2;
+
+  // Pulse solid core
+  const corePulse = 1 + Math.sin(t * 3) * 0.3;
+  coreSolid.scale.setScalar(corePulse);
+  coreSolidMat.opacity = 0.5 + Math.sin(t * 3) * 0.2;
+  coreHalo.scale.setScalar(1 + Math.sin(t * 2.5) * 0.4);
+  coreHaloMat.opacity = 0.1 + Math.sin(t * 2.5) * 0.06;
+
+  // Pulse rings
+  pulseRings.forEach(ring => {
+    const s = ring.userData.baseScale + Math.sin(t * 1.8 + ring.userData.phase) * 0.15;
+    ring.scale.setScalar(s);
+    ring.material.opacity = 0.35 + Math.sin(t * 1.8 + ring.userData.phase) * 0.2;
+    ring.rotation.z += dt * 0.3;
+    ring.rotation.x += dt * 0.15;
+  });
+
+  // Accent light pulse
+  accentLight.intensity = 7 + Math.sin(t * 3) * 1.5;
+
+  // === ORBITAL RINGS ===
+  orbitalRings.forEach(({ group, dots, def }) => {
+    group.rotation.y += dt * def.speed;
+
+    dots.forEach(dot => {
+      dot.userData.angle += dt * dot.userData.speed;
+      const a = dot.userData.angle;
+      dot.position.x = Math.cos(a) * dot.userData.radius;
+      dot.position.z = Math.sin(a) * dot.userData.radius;
+    });
+  });
+
+  // === AMBIENT PARTICLES ===
+  ambientParticles.rotation.y += dt * 0.04;
+  ambientParticles.rotation.x += dt * 0.02;
+
+  // === CORE PARTICLES ===
+  const posArr = coreParticles.geometry.attributes.position.array;
+  for (let i = 0; i < coreParticleCount; i++) {
+    const d = corePartData[i];
+    d.theta += dt * d.speed;
+    const r = d.radius + Math.sin(t * 1.2 + d.offset) * 0.25;
+    posArr[i * 3] = r * Math.sin(d.phi) * Math.cos(d.theta);
+    posArr[i * 3 + 1] = r * Math.sin(d.phi) * Math.sin(d.theta) + Math.sin(t * 0.6 + d.offset) * 0.3;
+    posArr[i * 3 + 2] = r * Math.cos(d.phi);
+  }
+  coreParticles.geometry.attributes.position.needsUpdate = true;
+
+  // === HOLOGRAM ===
+  hologramGroup.position.y = 0.6 + Math.sin(t * 0.7) * 0.2;
+  hologramGroup.rotation.z += dt * 0.15;
+
+  // Explode modules
+  holoModules.forEach(m => {
+    const target = exploded ? m.userData.explodePos : m.userData.originalPos;
+    m.position.lerp(target, dt * 3);
+  });
+
+  // === PANELS ===
+  panels.forEach((panel, i) => {
+    if (!panelsVisible) {
+      panel.material.opacity += (0 - panel.material.opacity) * dt * 4;
+    } else {
+      panel.material.opacity += (1 - panel.material.opacity) * dt * 3;
     }
-  });
-  // Pulse glow
-  const glowPulse = 0.25 + Math.sin(t * 2.5) * 0.08;
-  glowMesh.material.opacity = glowPulse;
-
-  // Pulse AI light
-  aiPointLight.intensity = 1.8 + Math.sin(t * 2.5) * 0.5;
-
-  // Rotate rings
-  ringMesh.rotation.z += dt * 0.8;
-  ringMesh.rotation.x += dt * 0.3;
-  ring2.rotation.z -= dt * 0.5;
-  ring2.rotation.y += dt * 0.4;
-
-  // Animate particles
-  particles.forEach(p => {
-    const ud = p.userData;
-    const angle = ud.theta + t * ud.speed;
-    const r = ud.baseRadius + Math.sin(t * 1.5 + ud.offset) * 0.08;
-    p.position.set(
-      r * Math.sin(ud.phi) * Math.cos(angle),
-      r * Math.sin(ud.phi) * Math.sin(angle),
-      r * Math.cos(ud.phi)
-    );
-    p.material.opacity = 0.3 + Math.sin(t * 2 + ud.offset) * 0.2;
+    // Subtle float
+    panel.position.y = panelDefs[i].pos[1] + Math.sin(t * 0.7 + i) * 0.15;
   });
 
-  // Smooth transition for explode / back panel
-  const lerpSpeed = 4 * dt;
-  [
-    { group: aiCoreGroup, key: 'aiCore' },
-    { group: cpuGroup, key: 'cpuModule' },
-    { group: gpuGroup, key: 'gpuModule' },
-    { group: batteryGroup, key: 'batteryModule' },
-    { group: sensorGroup, key: 'sensorModule' },
-  ].forEach(({ group, key }) => {
-    const target = exploded ? explodeTargets[key] : explodeOriginals[key];
-    group.position.lerp(target, lerpSpeed);
+  // Connection lines visibility
+  connectionLines.forEach(({ line }) => {
+    line.material.opacity = panelsVisible ? 0.25 : 0.02;
   });
+  holoLine.material.opacity = panelsVisible ? 0.3 : 0.03;
 
-  // Back panel
-  const bpTarget = backPanelOff ? backPanelOffTarget : backPanelOriginal;
-  backPanel.position.lerp(bpTarget, lerpSpeed);
+  // === UPDATE LIVE FEED PANEL ===
+  if (panelsVisible && Math.floor(t) % 3 === 0 && Math.floor(t) !== panels[3]?.userData?.lastUpdate) {
+    const feedPanel = panels[3];
+    if (feedPanel && feedPanel.userData) {
+      feedPanel.userData.lastUpdate = Math.floor(t);
+      const now = new Date();
+      const ts = now.toTimeString().slice(0, 8);
+      const updates = [
+        `> [${ts}] Neuro-opt v${Math.floor(Math.random()*9+1)}`,
+        `✓ [${ts}] Self-check passed`,
+        `> [${ts}] Module sync done`,
+        `✓ [${ts}] Cloud weights OK`,
+        `  [${ts}] Routine scan`,
+        `  [${ts}] Idle — nominal`,
+      ];
+      updatePanelTexture(feedPanel, 'LIVE UPDATE FEED', updates);
+    }
+  }
+
+  // === STREAM PARTICLES ===
+  streamParticles.forEach(({ points, data, group }) => {
+    const arr = points.geometry.attributes.position.array;
+    for (let i = 0; i < data.length; i++) {
+      data[i].angle += dt * data[i].speed;
+      arr[i * 3] = Math.cos(data[i].angle) * data[i].radius;
+      arr[i * 3 + 1] = 0;
+      arr[i * 3 + 2] = Math.sin(data[i].angle) * data[i].radius;
+    }
+    points.geometry.attributes.position.needsUpdate = true;
+  });
 
   renderer.render(scene, camera);
 }
@@ -739,48 +750,34 @@ window.toggleAutoRotate = function() {
 window.toggleExplode = function() {
   exploded = !exploded;
   document.getElementById('btnExplode').classList.toggle('active', exploded);
-  // Auto-open back panel when exploding
-  if (exploded && !backPanelOff) {
-    backPanelOff = true;
-    document.getElementById('btnBackPanel').classList.add('active');
-  } else if (!exploded && backPanelOff) {
-    backPanelOff = false;
-    document.getElementById('btnBackPanel').classList.remove('active');
-  }
 };
 
-window.toggleBackPanel = function() {
-  backPanelOff = !backPanelOff;
-  document.getElementById('btnBackPanel').classList.toggle('active', backPanelOff);
+window.togglePanels = function() {
+  panelsVisible = !panelsVisible;
+  document.getElementById('btnPanels').classList.toggle('active', !panelsVisible);
 };
 
 window.resetView = function() {
-  // Smooth reset camera
-  const start = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
-  const end = { x: 4.5, y: 1.8, z: 8 };
+  const startPos = camera.position.clone();
+  const endPos = new THREE.Vector3(5, 3.5, 10);
   const startTarget = controls.target.clone();
-  const endTarget = new THREE.Vector3(0, 0.1, 0);
+  const endTarget = new THREE.Vector3(0, 0.5, 0);
   const startTime = performance.now();
-  const duration = 800;
+  const duration = 900;
 
   function animReset(now) {
     const p = Math.min((now - startTime) / duration, 1);
-    const ease = 1 - Math.pow(1 - p, 3); // ease-out
-    camera.position.set(
-      start.x + (end.x - start.x) * ease,
-      start.y + (end.y - start.y) * ease,
-      start.z + (end.z - start.z) * ease
-    );
+    const ease = 1 - Math.pow(1 - p, 3);
+    camera.position.lerpVectors(startPos, endPos, ease);
     controls.target.lerpVectors(startTarget, endTarget, ease);
     if (p < 1) requestAnimationFrame(animReset);
   }
   requestAnimationFrame(animReset);
 
-  // Reset state
   exploded = false;
-  backPanelOff = false;
+  panelsVisible = true;
   document.getElementById('btnExplode').classList.remove('active');
-  document.getElementById('btnBackPanel').classList.remove('active');
+  document.getElementById('btnPanels').classList.remove('active');
   controls.autoRotate = true;
   document.getElementById('btnAutoRotate').classList.add('active');
 };
@@ -788,21 +785,28 @@ window.resetView = function() {
 window.captureScreenshot = function() {
   renderer.render(scene, camera);
   const link = document.createElement('a');
-  link.download = 'Yphone_3D_Render.png';
+  link.download = 'Yphone_Holographic_Render.png';
   link.href = renderer.domElement.toDataURL('image/png');
   link.click();
 };
 
-// ===== KEYBOARD SHORTCUTS =====
+// Click on hologram to toggle explode
+renderer.domElement.addEventListener('click', (e) => {
+  // Simple double-click detection for explode
+  if (e.detail === 2) {
+    window.toggleExplode();
+  }
+});
+
+// ===== KEYBOARD =====
 window.addEventListener('keydown', (e) => {
   switch(e.key.toLowerCase()) {
-    case 'r': controls.autoRotate = !controls.autoRotate;
-      document.getElementById('btnAutoRotate').classList.toggle('active', controls.autoRotate);
-      break;
+    case 'r': window.toggleAutoRotate(); break;
     case 'e': window.toggleExplode(); break;
-    case 'b': window.toggleBackPanel(); break;
+    case 'p': window.togglePanels(); break;
     case '0': window.resetView(); break;
-    case 's': if (!e.ctrlKey && !e.metaKey) { window.captureScreenshot(); } break;
+    case 's': if (!e.ctrlKey && !e.metaKey) window.captureScreenshot(); break;
+    case 'f': document.documentElement.requestFullscreen?.().catch(() => {}); break;
   }
 });
 
@@ -816,17 +820,15 @@ window.addEventListener('resize', () => {
 // ===== START =====
 animate();
 
-// Hide loading
 setTimeout(() => {
   document.getElementById('loading').classList.add('done');
-  setTimeout(() => document.getElementById('loading').remove(), 600);
-}, 400);
+  setTimeout(() => document.getElementById('loading').remove(), 700);
+}, 500);
 
-// Log info
-console.log('%cYphone 3D Viewer %c· %cBanana Company',
-  'font-weight:700;font-size:16px;color:#fff;', '', 'color:#0071e3;');
-console.log('R = auto-rotate | E = explode | B = back panel | S = screenshot | 0 = reset');
-console.log('Drag to rotate | Scroll to zoom | Right-drag to pan');
+console.log('%c⚡ YPHONE CORE %cHOLOGRAPHIC AI SYSTEM %c· %cBanana Company',
+  'color:#00d4ff;font-weight:700;font-size:16px;', 'color:#557788;', '', 'color:#0071e3;');
+console.log('R=orbit | E=explode | P=panels | S=screenshot | F=fullscreen | 0=reset');
+console.log('Double-click hologram to explode | Drag to rotate | Scroll to zoom');
 </script>
 </body>
 </html>
