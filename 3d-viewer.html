@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yphone — Wearable Holographic Projector</title>
+<title>Yphone Core — Interactive System</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{--cyan:#00d4ff;--amber:#ff9500;--green:#44ddaa;--white:#e8f0f8}
@@ -25,6 +25,8 @@
   .topbar>*{pointer-events:auto}
   .brand{font-size:18px;font-weight:600;color:var(--white);letter-spacing:-0.01em}
   .brand em{font-style:normal;color:var(--cyan)}
+  .brand a{color:inherit;text-decoration:none}
+  .brand small{display:block;margin-top:5px;font-size:8px;font-weight:500;letter-spacing:.18em;color:#607080}
   .tag{
     font-size:10px;letter-spacing:0.12em;color:var(--green);
     border:1px solid rgba(68,221,170,0.2);border-radius:20px;
@@ -47,6 +49,16 @@
   .ctrl:hover{color:#fff;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.12)}
   .ctrl.on{background:rgba(0,212,255,0.1);color:var(--cyan);border-color:rgba(0,212,255,0.25)}
   .ctrl.icon{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .ctrl.divider{width:1px;height:20px;padding:0;margin:7px 4px;background:rgba(255,255,255,.08);border:0;border-radius:0;pointer-events:none}
+
+  .mode-info{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:10;width:220px;color:var(--white);pointer-events:none}
+  .mode-index{font:9px/1 'SF Mono',monospace;letter-spacing:.18em;color:var(--green);margin-bottom:10px}
+  .mode-info h1{font-size:28px;line-height:1;letter-spacing:-.04em;margin:0 0 10px;font-weight:600}
+  .mode-info p{font-size:11px;line-height:1.55;color:#718092;margin:0}
+  .layer-key{margin-top:22px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;display:none}
+  .layer-key.show{display:block}
+  .layer-key span{display:flex;justify-content:space-between;padding:5px 0;font:8px/1.2 'SF Mono',monospace;letter-spacing:.08em;color:#607080}
+  .layer-key b{color:#9eb4c5;font-weight:500}
 
   /* Hint */
   .hint{
@@ -80,33 +92,55 @@
   .load span{font-size:10px;letter-spacing:0.14em;color:#446677}
 
   @media(max-width:600px){
-    .ctrls{gap:2px;padding:4px 5px}
-    .ctrl{padding:6px 10px;font-size:10px}
+    .ctrls{left:10px;right:10px;transform:none;gap:2px;padding:4px 5px;overflow-x:auto;justify-content:flex-start}
+    .ctrl{padding:6px 10px;font-size:9px}
     .ctrl.icon{width:28px;height:28px}
     .topbar{padding:12px 16px}
     .brand{font-size:15px}
+    .mode-info{left:16px;top:90px;transform:none;width:190px}
+    .mode-info h1{font-size:22px}
+    .mode-info p{font-size:10px}
+    .layer-key{display:none!important}
+    .hint{display:none}
   }
 </style>
 </head>
 <body>
 
-<div class="load" id="load"><div class="load-ring"></div><span>YPHONE PROJECTOR · INITIALIZING</span></div>
+<div class="load" id="load"><div class="load-ring"></div><span>YPHONE SYSTEM · INITIALIZING</span></div>
 
 <div class="topbar">
-  <div class="brand">YPHONE<em>·</em>PUCK</div>
-  <div class="tag">● LIVE PROJECTION</div>
+  <div class="brand"><a href="index.html">YPHONE<em>°</em>CORE</a><small>MODULAR INTELLIGENCE SYSTEM</small></div>
+  <div class="tag">● SYSTEM ONLINE</div>
 </div>
 
-<div class="hint" id="hint">DRAG TO ORBIT &nbsp;·&nbsp; SCROLL TO ZOOM &nbsp;·&nbsp; HOVER THE PUCK &nbsp;·&nbsp; CLICK PANELS</div>
+<aside class="mode-info" aria-live="polite">
+  <div class="mode-index" id="modeIndex">00 / CORE</div>
+  <h1 id="modeTitle">Yphone Core</h1>
+  <p id="modeDescription">The intelligence you keep. Every fast-changing component is isolated, serviceable and ready to move into a new form.</p>
+  <div class="layer-key" id="layerKey">
+    <span><b>SPATIAL ARRAY</b> VISION + PROJECTION</span>
+    <span><b>COMPUTE + AI</b> PROCESSING</span>
+    <span><b>ENERGY CELL</b> POWER</span>
+    <span><b>INTERFACE</b> UNIVERSAL LOCK</span>
+  </div>
+</aside>
+
+<div class="hint" id="hint">DRAG TO ORBIT &nbsp;·&nbsp; SCROLL TO ZOOM &nbsp;·&nbsp; SELECT A FORM &nbsp;·&nbsp; EXPLODE THE CORE</div>
 
 <div class="tooltip" id="tooltip"><div class="tt-name"></div><div class="tt-detail"></div></div>
 
 <div class="ctrls">
-  <button class="ctrl on" id="btnOrbit" onclick="t('orbit')">⟳ ORBIT</button>
-  <button class="ctrl on" id="btnProject" onclick="t('project')">☲ PROJECTION</button>
-  <button class="ctrl" id="btnPanels" onclick="t('panels')">⊞ DATA</button>
-  <button class="ctrl icon" onclick="resetAll()">↺</button>
-  <button class="ctrl icon" onclick="shot()">◎</button>
+  <button class="ctrl on" id="modeCore" onclick="setMode('core')">CORE</button>
+  <button class="ctrl" id="modeWrist" onclick="setMode('wrist')">WRIST</button>
+  <button class="ctrl" id="modeHandheld" onclick="setMode('handheld')">HANDHELD</button>
+  <button class="ctrl" id="modeDock" onclick="setMode('dock')">DOCK</button>
+  <span class="ctrl divider"></span>
+  <button class="ctrl" id="btnExplode" onclick="t('explode')">EXPLODE</button>
+  <button class="ctrl" id="btnProject" onclick="t('project')">INTERFACE</button>
+  <button class="ctrl on" id="btnOrbit" onclick="t('orbit')">ORBIT</button>
+  <button class="ctrl icon" aria-label="Reset view" onclick="resetAll()">↺</button>
+  <button class="ctrl icon" aria-label="Save image" onclick="shot()">◎</button>
 </div>
 
 <script type="importmap">
@@ -126,8 +160,8 @@ scene.background = new THREE.Color(0x0a0a0e);
 scene.fog = new THREE.Fog(0x0a0a0e, 4, 22);
 
 const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.3, 50);
-camera.position.set(2.8, 3.5, 5.5);
-camera.lookAt(0, 1.5, 0);
+camera.position.set(2.2,1.65,3.2);
+camera.lookAt(0,0.42,0);
 
 const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
 renderer.setSize(innerWidth,innerHeight);
@@ -144,7 +178,7 @@ ctrl3d.enableDamping=true;ctrl3d.dampingFactor=0.07;
 ctrl3d.autoRotate=true;ctrl3d.autoRotateSpeed=0.3;
 ctrl3d.minDistance=2;ctrl3d.maxDistance=12;
 ctrl3d.maxPolarAngle=Math.PI*0.65;
-ctrl3d.target.set(0,1.6,0);ctrl3d.update();
+ctrl3d.target.set(0,0.42,0);ctrl3d.update();
 
 // ========== LIGHTING (warm room + cool hologram) ==========
 // Warm desk lamp (key)
@@ -223,10 +257,16 @@ mugGroup.add(handle);
 
 scene.add(mugGroup);
 
-// ========== YPHONE PUCK (THE PRODUCT) ==========
+// ========== YPHONE CORE (THE PRODUCT) ==========
 const puckGroup = new THREE.Group();
 puckGroup.position.set(0,0.08,0);
+puckGroup.scale.setScalar(1.35);
 scene.add(puckGroup);
+
+// Carrier forms sit around the same long-life core.
+const carrierRoot = new THREE.Group();
+carrierRoot.position.set(0,0.08,0);
+scene.add(carrierRoot);
 
 // Main body (titanium cylinder)
 const puckBodyGeo = new THREE.CylinderGeometry(0.28,0.29,0.09,64);
@@ -245,6 +285,20 @@ const magRing = new THREE.Mesh(magRingGeo,
 magRing.rotation.x=Math.PI/2;magRing.position.y=0.005;
 puckGroup.add(magRing);
 
+// Replaceable energy cell
+const batteryGeo = new THREE.CylinderGeometry(0.245,0.25,0.035,64);
+const batteryMat = new THREE.MeshStandardMaterial({color:0x20242a,roughness:0.42,metalness:0.55});
+const batteryDisk = new THREE.Mesh(batteryGeo,batteryMat);
+batteryDisk.position.y=0.025;batteryDisk.castShadow=true;
+puckGroup.add(batteryDisk);
+
+// Replaceable compute + AI layer
+const computeGeo = new THREE.CylinderGeometry(0.22,0.22,0.022,64);
+const computeMat = new THREE.MeshStandardMaterial({color:0x164a3d,roughness:0.32,metalness:0.45,emissive:0x062018,emissiveIntensity:0.5});
+const computeDisk = new THREE.Mesh(computeGeo,computeMat);
+computeDisk.position.y=0.075;computeDisk.castShadow=true;
+puckGroup.add(computeDisk);
+
 // Top glass surface (the projector lens)
 const topGlassGeo = new THREE.CylinderGeometry(0.26,0.27,0.015,64);
 const topGlassMat = new THREE.MeshPhysicalMaterial({
@@ -257,13 +311,14 @@ topGlass.position.y=0.09;topGlass.receiveShadow=true;
 puckGroup.add(topGlass);
 
 // Lens rings (concentric circles on top)
+const lensRings=[];
 for(let i=0;i<3;i++){
   const ringGeo = new THREE.TorusGeometry(0.12+i*0.06,0.006,8,80);
   const ring = new THREE.Mesh(ringGeo,
     new THREE.MeshBasicMaterial({color:i===0?0x88ccff:0x336688,transparent:true,opacity:0.5-i*0.12,depthWrite:false})
   );
   ring.rotation.x=-Math.PI/2;ring.position.y=0.098;
-  puckGroup.add(ring);
+  puckGroup.add(ring);lensRings.push(ring);
 }
 
 // Center lens dot
@@ -278,6 +333,40 @@ const ledMat = new THREE.MeshBasicMaterial({color:0x44ddaa,transparent:true,opac
 const ledRing = new THREE.Mesh(ledGeo,ledMat);
 ledRing.rotation.x=Math.PI/2;ledRing.position.y=0.045;
 puckGroup.add(ledRing);
+
+// ========== INTERCHANGEABLE CARRIERS ==========
+const carrierMat = new THREE.MeshStandardMaterial({color:0x34363a,roughness:0.32,metalness:0.72});
+const carrierDarkMat = new THREE.MeshStandardMaterial({color:0x111216,roughness:0.48,metalness:0.28});
+
+function roundedBar(w,h,d,r=0.08,mat=carrierMat){
+  const shape=new THREE.Shape();
+  shape.moveTo(-w/2+r,-h/2);shape.lineTo(w/2-r,-h/2);shape.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);
+  shape.lineTo(w/2,h/2-r);shape.quadraticCurveTo(w/2,h/2,w/2-r,h/2);shape.lineTo(-w/2+r,h/2);
+  shape.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);shape.lineTo(-w/2,-h/2+r);shape.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);
+  const geo=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:0.02,bevelThickness:0.02});
+  geo.center();return new THREE.Mesh(geo,mat);
+}
+
+const wristCarrier=new THREE.Group();
+const wristA=roundedBar(0.48,0.9,0.075,0.13,carrierDarkMat);wristA.rotation.x=-Math.PI/2;wristA.position.set(0,0,-0.67);
+const wristB=wristA.clone();wristB.position.z=0.67;
+const wristCradle=new THREE.Mesh(new THREE.TorusGeometry(0.305,0.045,12,64),carrierMat);wristCradle.rotation.x=Math.PI/2;wristCradle.position.y=0.02;
+wristCarrier.add(wristA,wristB,wristCradle);wristCarrier.scale.setScalar(0.001);carrierRoot.add(wristCarrier);
+
+const handheldCarrier=new THREE.Group();
+const hhTop=roundedBar(1.12,0.12,0.075,0.05,carrierMat);hhTop.rotation.x=-Math.PI/2;hhTop.position.z=-0.92;
+const hhBottom=hhTop.clone();hhBottom.position.z=0.92;
+const hhSide=roundedBar(0.12,1.72,0.075,0.05,carrierMat);hhSide.rotation.x=-Math.PI/2;hhSide.position.x=-0.5;
+const hhSideR=hhSide.clone();hhSideR.position.x=0.5;
+const hhBack=new THREE.Mesh(new THREE.BoxGeometry(0.92,0.035,1.5),carrierDarkMat);hhBack.position.y=-0.005;hhBack.receiveShadow=true;
+handheldCarrier.add(hhTop,hhBottom,hhSide,hhSideR,hhBack);handheldCarrier.scale.setScalar(0.001);carrierRoot.add(handheldCarrier);
+
+const dockCarrier=new THREE.Group();
+const dockBase=new THREE.Mesh(new THREE.CylinderGeometry(0.72,0.82,0.12,64),carrierMat);dockBase.position.y=-0.04;dockBase.castShadow=true;
+const dockInset=new THREE.Mesh(new THREE.TorusGeometry(0.31,0.035,12,64),carrierDarkMat);dockInset.rotation.x=Math.PI/2;dockInset.position.y=0.03;
+dockCarrier.add(dockBase,dockInset);dockCarrier.scale.setScalar(0.001);carrierRoot.add(dockCarrier);
+
+const carrierGroups={wrist:wristCarrier,handheld:handheldCarrier,dock:dockCarrier};
 
 // ========== PROJECTION BEAM ==========
 const beamGroup = new THREE.Group();
@@ -327,7 +416,8 @@ beamGroup.add(beamPts);
 
 // ========== HOLOGRAPHIC CONTENT (above the puck) ==========
 const holoRoot = new THREE.Group();
-holoRoot.position.set(0,1.8,0);
+holoRoot.position.set(0,1.55,0);
+holoRoot.scale.setScalar(0.72);
 scene.add(holoRoot);
 
 // -- Central AI Core (3D geometric) --
@@ -486,8 +576,8 @@ renderer.domElement.addEventListener('mousemove',e=>{
     tooltip.classList.add('show');
     tooltip.style.left=e.clientX+'px';
     tooltip.style.top=e.clientY+'px';
-    tooltip.querySelector('.tt-name').textContent='Yphone Puck';
-    tooltip.querySelector('.tt-detail').textContent='Wearable Holographic Projector · Click & hold to drag';
+    tooltip.querySelector('.tt-name').textContent='Yphone Core';
+    tooltip.querySelector('.tt-detail').textContent='Long-life modular intelligence · Select EXPLODE to inspect';
     document.body.style.cursor='pointer';
   }else{
     tooltip.classList.remove('show');
@@ -510,40 +600,82 @@ renderer.domElement.addEventListener('click',e=>{
 });
 
 // ========== STATE ==========
-let projectionOn=true,panelsOn=true;
+let projectionOn=false,panelsOn=true,exploded=false,carrierMode='core';
+const modeCopy={
+  core:{index:'00 / CORE',title:'Yphone Core',description:'The intelligence you keep. Every fast-changing component is isolated, serviceable and ready to move into a new form.'},
+  wrist:{index:'01 / WRIST',title:'Wrist',description:'Ambient health, identity and light-touch assistance. The interface stays quiet until the moment needs more.'},
+  handheld:{index:'02 / HANDHELD',title:'Handheld',description:'A familiar grip for capture and precision. The carrier adds controls—not another disposable computer.'},
+  dock:{index:'03 / DOCK',title:'Dock',description:'Set the Core down to add room-scale power, sound and spatial projection for shared work.'}
+};
+
+window.setMode=function(mode){
+  carrierMode=mode;
+  document.querySelectorAll('[id^="mode"]').forEach(el=>{if(el.tagName==='BUTTON')el.classList.remove('on')});
+  const btn=document.getElementById('mode'+mode.charAt(0).toUpperCase()+mode.slice(1));if(btn)btn.classList.add('on');
+  const copy=modeCopy[mode];
+  document.getElementById('modeIndex').textContent=copy.index;
+  document.getElementById('modeTitle').textContent=copy.title;
+  document.getElementById('modeDescription').textContent=copy.description;
+};
 
 function t(what){
   if(what==='orbit'){ctrl3d.autoRotate=!ctrl3d.autoRotate;document.getElementById('btnOrbit').classList.toggle('on',ctrl3d.autoRotate)}
-  if(what==='project'){projectionOn=!projectionOn;document.getElementById('btnProject').classList.toggle('on',projectionOn)}
-  if(what==='panels'){panelsOn=!panelsOn;document.getElementById('btnPanels').classList.toggle('on',panelsOn)}
+  if(what==='project'){
+    projectionOn=!projectionOn;document.getElementById('btnProject').classList.toggle('on',projectionOn);
+    moveView(projectionOn);
+  }
+  if(what==='explode'){
+    exploded=!exploded;document.getElementById('btnExplode').classList.toggle('on',exploded);
+    document.getElementById('layerKey').classList.toggle('show',exploded);
+    panelsOn=!exploded;
+  }
 }
 window.t=t;
 
+function moveView(showInterface){
+  const sp=camera.position.clone(),ep=showInterface?new THREE.Vector3(3,2.8,5):new THREE.Vector3(2.2,1.65,3.2);
+  const st=ctrl3d.target.clone(),et=showInterface?new THREE.Vector3(0,1.15,0):new THREE.Vector3(0,0.42,0);
+  const s=performance.now();
+  (function anim(n){
+    const p=Math.min((n-s)/900,1),e=1-Math.pow(1-p,3);
+    camera.position.lerpVectors(sp,ep,e);ctrl3d.target.lerpVectors(st,et,e);
+    if(p<1)requestAnimationFrame(anim);
+  })(s);
+}
+
 window.resetAll=function(){
-  const sp=camera.position.clone(),ep=new THREE.Vector3(2.8,3.5,5.5);
-  const st=ctrl3d.target.clone(),et=new THREE.Vector3(0,1.6,0);
+  const sp=camera.position.clone(),ep=new THREE.Vector3(2.2,1.65,3.2);
+  const st=ctrl3d.target.clone(),et=new THREE.Vector3(0,0.42,0);
   const s=performance.now();
   (function anim(n){
     const p=Math.min((n-s)/800,1),e=1-Math.pow(1-p,3);
     camera.position.lerpVectors(sp,ep,e);ctrl3d.target.lerpVectors(st,et,e);
     if(p<1)requestAnimationFrame(anim);
   })(s);
-  projectionOn=true;panelsOn=true;ctrl3d.autoRotate=true;
-  ['btnProject','btnPanels'].forEach(id=>document.getElementById(id).classList.add('on'));
+  projectionOn=false;panelsOn=true;exploded=false;ctrl3d.autoRotate=true;setMode('core');
+  document.getElementById('btnProject').classList.remove('on');
+  document.getElementById('btnExplode').classList.remove('on');
+  document.getElementById('layerKey').classList.remove('show');
   document.getElementById('btnOrbit').classList.add('on');
 };
 
 window.shot=function(){
   renderer.render(scene,camera);
   const a=document.createElement('a');
-  a.download='Yphone_Puck_'+Date.now()+'.png';a.href=renderer.domElement.toDataURL('image/png');a.click();
+  a.download='Yphone_Core_'+carrierMode+'_'+Date.now()+'.png';a.href=renderer.domElement.toDataURL('image/png');a.click();
 };
+
+// Optional deep links are useful for presentations and review captures.
+const startupParams=new URLSearchParams(location.search);
+const startupMode=startupParams.get('mode');
+if(modeCopy[startupMode])setMode(startupMode);
+if(startupParams.get('explode')==='1')t('explode');
 
 // Keyboard
 addEventListener('keydown',e=>{
   switch(e.key.toLowerCase()){
     case'r':t('orbit');break;case'p':t('project');break;
-    case'd':t('panels');break;case's':if(!e.ctrlKey)shot();break;
+    case'e':t('explode');break;case'1':setMode('core');break;case'2':setMode('wrist');break;case'3':setMode('handheld');break;case'4':setMode('dock');break;case's':if(!e.ctrlKey)shot();break;
     case'f':document.documentElement.requestFullscreen?.().catch(()=>{});break;
     case'0':resetAll();break;
   }
@@ -565,13 +697,42 @@ function animate(){
   ctrl3d.update();
 
   // Hide hint on interaction
-  if(!hintGone&&(Math.abs(ctrl3d.target.x)>0.05||Math.abs(camera.position.x-2.8)>0.1)){
+  if(!hintGone&&(Math.abs(ctrl3d.target.x)>0.05||Math.abs(camera.position.x-2.2)>0.1)){
     document.getElementById('hint').style.opacity='0';hintGone=true;
   }
 
-  // Puck subtle float + rotation
+  // Core float, carrier transitions and exploded service view
   puckGroup.rotation.y+=dt*0.2;
-  puckGroup.position.y=0.08+Math.sin(t*0.8)*0.01;
+  const restingY=0.08+Math.sin(t*0.8)*0.01;
+  puckGroup.position.y=THREE.MathUtils.damp(puckGroup.position.y,exploded?0.68:restingY,7,dt);
+  carrierRoot.rotation.y=puckGroup.rotation.y;
+  carrierRoot.position.y=restingY;
+  Object.entries(carrierGroups).forEach(([name,group])=>{
+    const target=carrierMode===name?1.35:0.001;
+    const next=THREE.MathUtils.damp(group.scale.x,target,7,dt);
+    group.scale.setScalar(next);
+    group.visible=next>0.01;
+  });
+
+  const layerY={
+    mag:exploded?-0.38:0.005,
+    battery:exploded?-0.20:0.025,
+    body:exploded?0.02:0.045,
+    compute:exploded?0.25:0.075,
+    glass:exploded?0.48:0.09,
+    lens:exploded?0.49:0.098,
+    dot:exploded?0.505:0.099,
+    beam:exploded?0.50:0.10
+  };
+  magRing.position.y=THREE.MathUtils.damp(magRing.position.y,layerY.mag,7,dt);
+  batteryDisk.position.y=THREE.MathUtils.damp(batteryDisk.position.y,layerY.battery,7,dt);
+  puckBody.position.y=THREE.MathUtils.damp(puckBody.position.y,layerY.body,7,dt);
+  ledRing.position.y=THREE.MathUtils.damp(ledRing.position.y,layerY.body,7,dt);
+  computeDisk.position.y=THREE.MathUtils.damp(computeDisk.position.y,layerY.compute,7,dt);
+  topGlass.position.y=THREE.MathUtils.damp(topGlass.position.y,layerY.glass,7,dt);
+  lensRings.forEach(r=>r.position.y=THREE.MathUtils.damp(r.position.y,layerY.lens,7,dt));
+  lensDot.position.y=THREE.MathUtils.damp(lensDot.position.y,layerY.dot,7,dt);
+  beamGroup.position.y=THREE.MathUtils.damp(beamGroup.position.y,layerY.beam,7,dt);
 
   // Lens pulse
   const lensPulse=1+Math.sin(t*3)*0.3;
@@ -642,7 +803,7 @@ function animate(){
 
   // Panels
   panels.forEach((p,i)=>{
-    const targetOp=panelsOn&&projectionOn?1:0.04;
+    const targetOp=panelsOn&&projectionOn&&!exploded?1:0.04;
     p.material.opacity+=(targetOp-p.material.opacity)*dt*4;
     // Subtle float
     p.position.y=p.userData.p[1]+Math.sin(t*0.7+i*0.8)*0.06;
@@ -652,10 +813,10 @@ function animate(){
   ambPts.rotation.y+=dt*0.06;
 
   // Hologram float
-  holoRoot.position.y=1.8+Math.sin(t*0.5)*0.08;
+  holoRoot.position.y=1.55+Math.sin(t*0.5)*0.06;
 
   // Update live feed panel (index 5)
-  if(panelsOn&&projectionOn&&Math.floor(t)%4===0&&Math.floor(t)!==panels[5]?.userData._lu){
+  if(panelsOn&&projectionOn&&!exploded&&Math.floor(t)%4===0&&Math.floor(t)!==panels[5]?.userData._lu){
     const fp=panels[5];if(fp?.userData){
       fp.userData._lu=Math.floor(t);
       const ts=new Date().toTimeString().slice(0,8);
@@ -679,9 +840,9 @@ function animate(){
 animate();
 setTimeout(()=>{document.getElementById('load').classList.add('done');setTimeout(()=>document.getElementById('load').remove(),600)},400);
 
-console.log('%c⚡ YPHONE PUCK %c· %cBanana Company %c· %cWearable Holographic Projector',
+console.log('%c⚡ YPHONE CORE %c· %cBanana Company %c· %cModular Spatial Intelligence',
   'color:#00d4ff;font-weight:700;font-size:15px;','','color:#0071e3;','','color:#557788;');
-console.log('HOVER the puck | CLICK panels | R=orbit P=projection D=data | 0=reset');
+console.log('1–4=forms | E=explode | P=interface | R=orbit | 0=reset');
 </script>
 </body>
 </html>
