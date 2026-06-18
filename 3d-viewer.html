@@ -265,7 +265,7 @@ scene.add(mugGroup);
 // ========== YPHONE CORE (THE PRODUCT) ==========
 const puckGroup = new THREE.Group();
 puckGroup.position.set(0,0.08,0);
-puckGroup.scale.setScalar(1.35);
+puckGroup.scale.setScalar(1.12);
 scene.add(puckGroup);
 
 // Carrier forms sit around the same long-life core.
@@ -274,69 +274,69 @@ carrierRoot.position.set(0,0.08,0);
 scene.add(carrierRoot);
 
 // Main body (titanium cylinder)
-const puckBodyGeo = new THREE.CylinderGeometry(0.28,0.29,0.09,64);
+const puckBodyGeo = new THREE.CylinderGeometry(0.26,0.27,0.06,64);
 const puckBodyMat = new THREE.MeshStandardMaterial({
   color:0xc8c4bc,roughness:0.28,metalness:0.85
 });
 const puckBody = new THREE.Mesh(puckBodyGeo,puckBodyMat);
-puckBody.position.y=0.045;puckBody.castShadow=true;puckBody.receiveShadow=true;
+puckBody.position.y=0.03;puckBody.castShadow=true;puckBody.receiveShadow=true;
 puckGroup.add(puckBody);
 
 // Bottom ring (magnetic attachment)
-const magRingGeo = new THREE.TorusGeometry(0.26,0.015,16,64);
+const magRingGeo = new THREE.TorusGeometry(0.24,0.011,16,64);
 const magRing = new THREE.Mesh(magRingGeo,
   new THREE.MeshStandardMaterial({color:0x888480,roughness:0.3,metalness:0.9})
 );
-magRing.rotation.x=Math.PI/2;magRing.position.y=0.005;
+magRing.rotation.x=Math.PI/2;magRing.position.y=0.003;
 puckGroup.add(magRing);
 
 // Replaceable energy cell
-const batteryGeo = new THREE.CylinderGeometry(0.245,0.25,0.035,64);
+const batteryGeo = new THREE.CylinderGeometry(0.22,0.225,0.02,64);
 const batteryMat = new THREE.MeshStandardMaterial({color:0x20242a,roughness:0.42,metalness:0.55});
 const batteryDisk = new THREE.Mesh(batteryGeo,batteryMat);
-batteryDisk.position.y=0.025;batteryDisk.castShadow=true;
+batteryDisk.position.y=0.014;batteryDisk.castShadow=true;
 puckGroup.add(batteryDisk);
 
 // Replaceable compute + AI layer
-const computeGeo = new THREE.CylinderGeometry(0.22,0.22,0.022,64);
+const computeGeo = new THREE.CylinderGeometry(0.195,0.195,0.014,64);
 const computeMat = new THREE.MeshStandardMaterial({color:0x164a3d,roughness:0.32,metalness:0.45,emissive:0x062018,emissiveIntensity:0.5});
 const computeDisk = new THREE.Mesh(computeGeo,computeMat);
-computeDisk.position.y=0.075;computeDisk.castShadow=true;
+computeDisk.position.y=0.052;computeDisk.castShadow=true;
 puckGroup.add(computeDisk);
 
 // Top glass surface (the projector lens)
-const topGlassGeo = new THREE.CylinderGeometry(0.26,0.27,0.015,64);
+const topGlassGeo = new THREE.CylinderGeometry(0.235,0.245,0.01,64);
 const topGlassMat = new THREE.MeshPhysicalMaterial({
   color:0x0a0a10,roughness:0.05,metalness:0.02,
   clearcoat:0.4,clearcoatRoughness:0.05,
   emissive:0x001122,emissiveIntensity:0.3
 });
 const topGlass = new THREE.Mesh(topGlassGeo,topGlassMat);
-topGlass.position.y=0.09;topGlass.receiveShadow=true;
+topGlass.position.y=0.064;topGlass.receiveShadow=true;
 puckGroup.add(topGlass);
 
 // Lens rings (concentric circles on top)
 const lensRings=[];
 for(let i=0;i<3;i++){
-  const ringGeo = new THREE.TorusGeometry(0.12+i*0.06,0.006,8,80);
+  const ringGeo = new THREE.TorusGeometry(0.10+i*0.052,0.0045,8,80);
   const ring = new THREE.Mesh(ringGeo,
     new THREE.MeshBasicMaterial({color:i===0?0x88ccff:0x336688,transparent:true,opacity:0.5-i*0.12,depthWrite:false})
   );
-  ring.rotation.x=-Math.PI/2;ring.position.y=0.098;
+  ring.rotation.x=-Math.PI/2;ring.position.y=0.07;
   puckGroup.add(ring);lensRings.push(ring);
 }
 
 // Center lens dot
-const lensDotGeo = new THREE.SphereGeometry(0.04,16,16);
+const lensDotGeo = new THREE.SphereGeometry(0.024,16,16);
 const lensDotMat = new THREE.MeshBasicMaterial({color:0x88ddff,transparent:true,opacity:0.8,depthWrite:false});
 const lensDot = new THREE.Mesh(lensDotGeo,lensDotMat);
-lensDot.position.y=0.099;puckGroup.add(lensDot);
+lensDot.position.y=0.071;puckGroup.add(lensDot);
 
 // Puck edge LED indicator
-const ledGeo = new THREE.TorusGeometry(0.275,0.004,8,120);
+const ledGeo = new THREE.TorusGeometry(0.255,0.0035,8,120);
 const ledMat = new THREE.MeshBasicMaterial({color:0x44ddaa,transparent:true,opacity:0.7,depthWrite:false});
 const ledRing = new THREE.Mesh(ledGeo,ledMat);
-ledRing.rotation.x=Math.PI/2;ledRing.position.y=0.045;
+ledRing.rotation.x=Math.PI/2;ledRing.position.y=0.03;
 puckGroup.add(ledRing);
 
 // ========== INTERCHANGEABLE CARRIERS ==========
@@ -375,7 +375,7 @@ const carrierGroups={wrist:wristCarrier,handheld:handheldCarrier,dock:dockCarrie
 
 // ========== PROJECTION BEAM ==========
 const beamGroup = new THREE.Group();
-beamGroup.position.set(0,0.1,0);
+beamGroup.position.set(0,0.073,0);
 puckGroup.add(beamGroup);
 
 // Inner beam cone
@@ -737,14 +737,14 @@ function animate(){
   });
 
   const layerY={
-    mag:exploded?-0.38:0.005,
-    battery:exploded?-0.20:0.025,
-    body:exploded?0.02:0.045,
-    compute:exploded?0.25:0.075,
-    glass:exploded?0.48:0.09,
-    lens:exploded?0.49:0.098,
-    dot:exploded?0.505:0.099,
-    beam:exploded?0.50:0.10
+    mag:exploded?-0.38:0.003,
+    battery:exploded?-0.20:0.014,
+    body:exploded?0.02:0.03,
+    compute:exploded?0.25:0.052,
+    glass:exploded?0.48:0.064,
+    lens:exploded?0.49:0.07,
+    dot:exploded?0.505:0.071,
+    beam:exploded?0.50:0.073
   };
   magRing.position.y=THREE.MathUtils.damp(magRing.position.y,layerY.mag,7,dt);
   batteryDisk.position.y=THREE.MathUtils.damp(batteryDisk.position.y,layerY.battery,7,dt);

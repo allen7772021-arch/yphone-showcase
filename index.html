@@ -18,7 +18,7 @@
       --ease: cubic-bezier(.22,1,.36,1);
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-snap-type:y mandatory; }
     body {
       margin: 0;
       color: var(--ink);
@@ -30,6 +30,7 @@
     a { color: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }
     button { font: inherit; }
+    [data-slide]{scroll-snap-align:start;scroll-snap-stop:always;min-height:100vh}
     .shell { width: min(1240px, calc(100% - 48px)); margin-inline: auto; }
     .nav {
       position: fixed; z-index: 50; inset: 0 0 auto;
@@ -187,13 +188,24 @@
     footer { background:#464e50;color:rgba(255,255,255,.5);border-top:1px solid rgba(255,255,255,.1);padding:24px 0;font-size:12px; }
     footer .shell { display:flex;justify-content:space-between;gap:20px; }
 
-    .qr-card{position:fixed;z-index:70;left:22px;bottom:22px;display:flex;align-items:center;gap:11px;padding:8px 14px 8px 8px;background:rgba(246,247,244,.9);border:1px solid rgba(32,39,43,.1);box-shadow:0 16px 42px rgba(30,38,40,.2);backdrop-filter:blur(16px);text-decoration:none;color:#253237;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+    .qr-card{position:fixed;z-index:70;left:22px;bottom:22px;display:flex;align-items:center;gap:11px;padding:8px 14px 8px 8px;background:rgba(246,247,244,.9);border:1px solid rgba(32,39,43,.1);box-shadow:0 16px 42px rgba(30,38,40,.2);backdrop-filter:blur(16px);text-decoration:none;color:#253237;opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .4s var(--ease),transform .4s var(--ease),box-shadow .25s var(--ease)}
+    .qr-card.visible{opacity:1;pointer-events:auto;transform:none}
     .qr-card:hover{transform:translateY(-3px);box-shadow:0 21px 52px rgba(30,38,40,.26)}
     .qr-card img{width:66px;height:66px;display:block}
     .qr-copy{display:flex;flex-direction:column;min-width:104px}
     .qr-copy small{font-size:8px;letter-spacing:.15em;color:#718d5d;font-weight:750}
     .qr-copy strong{font-size:14px;margin-top:5px;letter-spacing:-.02em}
     .qr-copy em{font-size:9px;margin-top:3px;color:#718085;font-style:normal}
+
+    .show-status{position:fixed;z-index:72;top:18px;left:50%;transform:translateX(-50%);width:210px;padding:8px 12px 9px;border:1px solid rgba(255,255,255,.14);background:rgba(67,75,77,.6);color:rgba(255,255,255,.78);backdrop-filter:blur(14px);cursor:pointer;font:700 9px/1 'SF Mono',monospace;letter-spacing:.12em;text-align:left}
+    .show-status-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .show-live{display:inline-flex;align-items:center;gap:7px}
+    .show-live::before{content:'';width:5px;height:5px;border-radius:50%;background:#b7d49e;box-shadow:0 0 8px rgba(183,212,158,.7)}
+    .show-progress{position:absolute;left:0;bottom:0;height:2px;width:var(--show-progress,0%);background:#7fc4d2;transition:width .1s linear}
+    .show-status.paused .show-live::before{background:#a7aaab;box-shadow:none}
+
+    .team-info{margin-top:42px;color:rgba(255,255,255,.58);font-size:13px;line-height:1.9;letter-spacing:.01em}
+    .team-info strong{color:#fff;font-weight:650}
 
     .reveal { opacity:0; transform:translateY(36px); transition:opacity .9s var(--ease),transform .9s var(--ease); }
     .reveal.visible { opacity:1;transform:none; }
@@ -235,6 +247,7 @@
       .qr-card{left:12px;bottom:12px;padding:6px;border-radius:2px}
       .qr-card img{width:48px;height:48px}
       .qr-copy{display:none}
+      .show-status{top:auto;bottom:14px;width:178px;padding:7px 9px 8px;font-size:8px}
     }
     @media (prefers-reduced-motion: reduce) {
       *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important; }
@@ -247,24 +260,29 @@
       <a class="wordmark" href="#top"><span class="nav-mark"><img src="banana-logo.png" alt="Banana Company logo"></span><span class="word-block"><span class="word-name">Yphone<span class="accent">°</span></span><small>BANANA COMPANY</small></span></a>
       <div class="nav-links">
         <a href="#forms">Forms</a><a href="#anatomy">Core</a><a href="#impact">Impact</a>
-        <a class="nav-cta" href="3d-viewer.html">Explore in 3D</a>
+        <a class="nav-cta" href="#forms">The system</a>
       </div>
     </div>
   </nav>
+
+  <button class="show-status" id="showStatus" type="button" aria-label="Pause automatic presentation">
+    <span class="show-status-row"><span class="show-live" id="showMode">AUTO PRESENTATION</span><span id="showCount">01 / 07</span></span>
+    <span class="show-progress" id="showProgress"></span>
+  </button>
 
   <a class="qr-card" href="https://allen7772021-arch.github.io/yphone-showcase/3d-viewer.html" target="_blank" rel="noopener" aria-label="Open the Yphone 3D spatial experience">
     <img src="qr-yphone-3d.png" alt="QR code linking to the Yphone 3D experience">
     <span class="qr-copy"><small>SCAN TO ENTER</small><strong>Yphone 3D</strong><em>Spatial experience</em></span>
   </a>
 
-  <header class="hero" id="top">
+  <header class="hero" id="top" data-slide>
     <div class="shell hero-grid">
       <div class="hero-text reveal">
         <div class="eyebrow">Banana Company presents · A device that refuses to become waste</div>
         <h1>One core.<br>Many forms.</h1>
         <p class="hero-copy"><strong>Yphone is the intelligence you keep.</strong> Wear it, carry it or dock it. When technology moves forward, replace one module—not everything around it.</p>
         <div class="actions">
-          <a class="button primary" href="3d-viewer.html">Explore the system <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a>
+          <a class="button primary" href="#forms">Discover the system <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a>
           <a class="button ghost" href="#forms">See the forms</a>
         </div>
       </div>
@@ -283,7 +301,7 @@
   </header>
 
   <main>
-    <section class="light">
+    <section class="light" data-slide>
       <div class="shell">
         <div class="intro reveal">
           <div><div class="eyebrow">The shift</div><h2 class="display">Stop replacing the whole.</h2></div>
@@ -297,7 +315,7 @@
       </div>
     </section>
 
-    <section class="forms" id="forms">
+    <section class="forms" id="forms" data-slide>
       <div class="shell">
         <div class="section-head reveal"><div><div class="eyebrow" style="color:var(--green)">One identity, three contexts</div><h2>It becomes what<br>the moment needs.</h2></div><p>The Core carries your AI, credentials and personal context. The object around it is simply the best interface for where you are.</p></div>
         <div class="form-tabs reveal" role="tablist" aria-label="Yphone carrier forms">
@@ -313,7 +331,7 @@
       </div>
     </section>
 
-    <section class="anatomy" id="anatomy">
+    <section class="anatomy" id="anatomy" data-slide>
       <div class="shell anatomy-layout">
         <div class="anatomy-copy reveal">
           <div class="eyebrow">Designed for disassembly</div><h2>Upgrade the layer. Keep the life.</h2>
@@ -329,7 +347,7 @@
       </div>
     </section>
 
-    <section class="intelligence" id="intelligence">
+    <section class="intelligence" id="intelligence" data-slide>
       <div class="intelligence-inner reveal">
         <div class="eyebrow">Yphone Intelligence</div><h2>Less screen.<br>More space.</h2>
         <p>Your assistant lives around the task, not inside a tiny rectangle. Speak, point and move naturally. Information appears in context, then gets out of the way.</p>
@@ -338,7 +356,7 @@
       </div>
     </section>
 
-    <section class="impact" id="impact">
+    <section class="impact" id="impact" data-slide>
       <div class="shell">
         <div class="impact-top reveal"><div><div class="eyebrow">Circular by architecture</div><h2>Waste less by keeping more.</h2></div><p>Yphone is designed around a simple environmental idea: the most sustainable component is the one that never has to be remade.</p></div>
         <div class="impact-cards reveal">
@@ -350,8 +368,8 @@
       </div>
     </section>
 
-    <section class="closing">
-      <div class="reveal"><div class="eyebrow" style="color:var(--green)">Yphone by Banana Company</div><h2>Evolve.<br>Don't replace.</h2><p>One intelligent core for a world of changing devices.</p><div class="actions" style="justify-content:center"><a class="button primary" href="3d-viewer.html">Explore Yphone in 3D</a></div></div>
+    <section class="closing" id="closing" data-slide>
+      <div class="reveal"><div class="eyebrow" style="color:#d7e4c9">Yphone by Banana Company</div><h2>Evolve.<br>Don't replace.</h2><p>One intelligent core for a world of changing devices.</p><div class="actions" style="justify-content:center"><a class="button primary" href="#top">Watch again</a></div><div class="team-info"><strong>Banana Company</strong> &nbsp;·&nbsp; Angelina (Boss) &nbsp;·&nbsp; Van (Design) &nbsp;·&nbsp; Allen (Sales) &nbsp;·&nbsp; Emma (Assistant)<br>University of Western Australia &nbsp;·&nbsp; Class Concept 2026</div></div>
     </section>
   </main>
   <footer><div class="shell"><span>Yphone concept study · Banana Company</span><span>Designed around longevity, repair and spatial computing.</span></div></footer>
@@ -376,6 +394,71 @@
       if(entry.isIntersecting){ entry.target.classList.add('visible'); observer.unobserve(entry.target); }
     }), {threshold:.12});
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Exhibition mode: a self-running seven-slide presentation that loops forever.
+    const slides=[...document.querySelectorAll('[data-slide]')];
+    const showStatus=document.getElementById('showStatus');
+    const showMode=document.getElementById('showMode');
+    const showCount=document.getElementById('showCount');
+    const qrCard=document.querySelector('.qr-card');
+    const SHOW_DURATION=9000;
+    const IDLE_RESUME=12000;
+    let showIndex=0,showRunning=true,showTimer=null,idleTimer=null,slideStarted=performance.now();
+
+    function updateShowUI(){
+      showCount.textContent=`${String(showIndex+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;
+      showMode.textContent=showRunning?'AUTO PRESENTATION':'PAUSED · TAP TO RESUME';
+      showStatus.classList.toggle('paused',!showRunning);
+      showStatus.setAttribute('aria-label',showRunning?'Pause automatic presentation':'Resume automatic presentation');
+      qrCard.classList.toggle('visible',slides[showIndex]?.id==='intelligence');
+    }
+    function scheduleShow(){
+      clearTimeout(showTimer);
+      if(showRunning)showTimer=setTimeout(()=>goToSlide((showIndex+1)%slides.length,true),SHOW_DURATION);
+    }
+    function activateSlide(index){
+      if(index===showIndex)return;
+      showIndex=index;slideStarted=performance.now();updateShowUI();scheduleShow();
+    }
+    function goToSlide(index,automatic=false){
+      const wrapping=automatic&&showIndex===slides.length-1&&index===0;
+      showIndex=index;slideStarted=performance.now();updateShowUI();
+      slides[index].scrollIntoView({behavior:wrapping?'auto':'smooth',block:'start'});
+      scheduleShow();
+    }
+    function pauseShow(){
+      showRunning=false;clearTimeout(showTimer);clearTimeout(idleTimer);updateShowUI();
+      idleTimer=setTimeout(resumeShow,IDLE_RESUME);
+    }
+    function resumeShow(){
+      showRunning=true;clearTimeout(idleTimer);slideStarted=performance.now();updateShowUI();scheduleShow();
+    }
+
+    const slideObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting&&entry.intersectionRatio>=.55)activateSlide(slides.indexOf(entry.target));
+    }),{threshold:[.55]});
+    slides.forEach(slide=>slideObserver.observe(slide));
+
+    showStatus.addEventListener('click',event=>{
+      event.stopPropagation();showRunning?pauseShow():resumeShow();
+    });
+    document.addEventListener('pointerdown',event=>{
+      if(!event.target.closest('#showStatus'))pauseShow();
+    });
+    document.addEventListener('keydown',event=>{
+      if(['ArrowDown','ArrowRight','ArrowUp','ArrowLeft',' '].includes(event.key))event.preventDefault();
+      if(event.key==='ArrowDown'||event.key==='ArrowRight'){pauseShow();goToSlide((showIndex+1)%slides.length)}
+      if(event.key==='ArrowUp'||event.key==='ArrowLeft'){pauseShow();goToSlide((showIndex-1+slides.length)%slides.length)}
+      if(event.key===' '){showRunning?pauseShow():resumeShow()}
+      if(event.key.toLowerCase()==='f')document.documentElement.requestFullscreen?.().catch(()=>{});
+    });
+
+    (function paintProgress(now){
+      const progress=showRunning?Math.min((now-slideStarted)/SHOW_DURATION,1):0;
+      showStatus.style.setProperty('--show-progress',`${progress*100}%`);
+      requestAnimationFrame(paintProgress);
+    })(performance.now());
+    updateShowUI();scheduleShow();
   </script>
 </body>
 </html>
