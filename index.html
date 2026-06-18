@@ -9,12 +9,12 @@
   <style>
     :root {
       --ink: #0d0d0f;
-      --paper: #f4f3ef;
-      --muted: #737378;
+      --paper: #e3e5e4;
+      --muted: #687277;
       --line: rgba(20,20,24,.12);
-      --blue: #1687ff;
-      --green: #b8f04a;
-      --dark: #050506;
+      --blue: #2f8fa8;
+      --green: #718d5d;
+      --dark: #666c6d;
       --ease: cubic-bezier(.22,1,.36,1);
     }
     * { box-sizing: border-box; }
@@ -34,12 +34,14 @@
     .nav {
       position: fixed; z-index: 50; inset: 0 0 auto;
       height: 64px; color: white;
-      background: linear-gradient(180deg, rgba(5,5,6,.88), rgba(5,5,6,0));
+      background: linear-gradient(180deg, rgba(65,72,73,.92), rgba(65,72,73,0));
       display: flex; align-items: center;
     }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; }
     .wordmark { display:flex;align-items:center;gap:9px;font-weight: 680; letter-spacing: -.04em; font-size: 20px; text-decoration: none; }
     .wordmark .accent { color: var(--green); }
+    .word-block{display:flex;flex-direction:column;line-height:.9}
+    .word-block small{margin-top:5px;font-size:7px;letter-spacing:.16em;color:rgba(255,255,255,.55);font-weight:600}
     .nav-mark{width:34px;height:34px;border-radius:50%;overflow:hidden;background:#f7f7f5;display:block;box-shadow:0 7px 22px rgba(0,0,0,.24)}
     .nav-mark img{width:56px;height:auto;display:block;transform:translate(-10px,-7px);mix-blend-mode:multiply}
     .nav-links { display: flex; align-items: center; gap: 28px; font-size: 13px; color: rgba(255,255,255,.68); }
@@ -54,13 +56,13 @@
     .hero::before {
       content: ""; position: absolute; width: 68vw; height: 68vw; max-width: 980px; max-height: 980px;
       right: -16vw; top: -20vw; border-radius: 50%;
-      background: radial-gradient(circle, rgba(36,148,255,.18), rgba(36,148,255,.03) 42%, transparent 68%);
+      background: radial-gradient(circle, rgba(70,177,199,.28), rgba(70,177,199,.07) 42%, transparent 68%);
       filter: blur(10px);
     }
     .hero-grid { position: relative; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 4vw; padding: 116px 0 70px; }
     .hero-text,.product-stage { min-width:0; }
     .eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
-    .hero .eyebrow { color: var(--green); }
+    .hero .eyebrow { color: #d7e4c9; }
     h1 { margin: 18px 0 24px; font-size: clamp(64px, 8.8vw, 132px); line-height: .86; letter-spacing: -.075em; font-weight: 650; }
     .hero-copy { max-width: 550px; color: rgba(255,255,255,.58); font-size: clamp(18px, 2vw, 24px); line-height: 1.42; letter-spacing: -.02em; }
     .hero-copy strong { color: white; font-weight: 560; }
@@ -108,14 +110,14 @@
     .proof-value { font-size:clamp(42px,5vw,72px); letter-spacing:-.06em; font-weight:650; }
     .proof p { max-width:250px; color:var(--muted); line-height:1.5; font-size:14px; }
 
-    .forms { background:#111114; color:white; padding:130px 0 150px; }
+    .forms { background:#596163; color:white; padding:130px 0 150px; }
     .section-head { display:flex; justify-content:space-between; align-items:end; gap:30px; margin-bottom:54px; }
     .section-head h2 { margin:12px 0 0; font-size:clamp(44px,6vw,80px); line-height:.96; letter-spacing:-.06em; font-weight:630; }
     .section-head p { max-width:430px; color:rgba(255,255,255,.5); line-height:1.55; font-size:16px; }
     .form-tabs { display:flex; border-top:1px solid rgba(255,255,255,.15); }
     .form-tab { flex:1; padding:22px 0; color:rgba(255,255,255,.38); background:none; border:0; border-top:2px solid transparent; cursor:pointer; text-align:left; font-size:13px; letter-spacing:.06em; transition:.25s; }
     .form-tab.active { color:white; border-top-color:var(--green); }
-    .form-stage { min-height:560px; position:relative; overflow:hidden; border-radius:2px; background:radial-gradient(circle at 50% 50%,#222730 0,#101114 48%,#080809 78%); }
+    .form-stage { min-height:560px; position:relative; overflow:hidden; border-radius:2px; background:radial-gradient(circle at 50% 50%,#778184 0,#555e60 48%,#3f4749 78%); }
     .form-copy { position:absolute; z-index:4; left:5%; top:50%; transform:translateY(-50%); width:290px; }
     .form-kicker { color:var(--green); font:11px/1 monospace; letter-spacing:.16em; }
     .form-copy h3 { margin:14px 0 14px; font-size:42px; letter-spacing:-.05em; }
@@ -133,7 +135,7 @@
     .device.dock .device-core { transform:rotateX(-62deg); }
     .form-meta { position:absolute; right:28px; bottom:24px; display:flex; gap:26px; font:10px/1.5 monospace; color:rgba(255,255,255,.35); text-align:right; }
 
-    .anatomy { padding:145px 0; background:#e9e8e3; overflow:hidden; }
+    .anatomy { padding:145px 0; background:#cfd2d1; overflow:hidden; }
     .anatomy-layout { display:grid; grid-template-columns:.75fr 1.25fr; gap:5vw; align-items:center; }
     .anatomy h2 { font-size:clamp(48px,6vw,84px); margin:14px 0 24px; line-height:.96; letter-spacing:-.06em; }
     .anatomy-copy p { color:#66666b; font-size:18px; line-height:1.55; max-width:440px; }
@@ -153,8 +155,8 @@
     .l4 { width:250px;height:250px;background:radial-gradient(circle at 44% 38%,#275e7a,#061017 52%,#020304);border:2px solid #a6a8aa;transform:translateY(-109px) rotateX(68deg);box-shadow:inset 0 0 30px rgba(22,135,255,.25),0 20px 35px rgba(0,0,0,.28); }
     .l4::after { content:"SPATIAL ARRAY"; }
 
-    .intelligence { min-height:900px; background:#030405; color:white; position:relative; overflow:hidden; display:grid; place-items:center; }
-    .intelligence::before { content:""; position:absolute; inset:0; background:linear-gradient(rgba(40,170,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(40,170,255,.045) 1px,transparent 1px); background-size:70px 70px; mask-image:linear-gradient(transparent,black 25%,black 75%,transparent); }
+    .intelligence { min-height:900px; background:#50585a; color:white; position:relative; overflow:hidden; display:grid; place-items:center; }
+    .intelligence::before { content:""; position:absolute; inset:0; background:linear-gradient(rgba(82,190,210,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(82,190,210,.09) 1px,transparent 1px); background-size:70px 70px; mask-image:linear-gradient(transparent,black 25%,black 75%,transparent); }
     .intelligence-inner { position:relative; z-index:2; text-align:center; max-width:900px; padding:130px 24px; }
     .intelligence .eyebrow { color:#55c5ff; }
     .intelligence h2 { font-size:clamp(58px,9vw,122px); line-height:.88; letter-spacing:-.07em; margin:20px 0 28px; font-weight:620; }
@@ -179,11 +181,19 @@
     .impact-card.accent small,.impact-card.accent p { color:#27300f; }
     .impact-note { margin-top:18px;color:#8a8a8e;font-size:11px; }
 
-    .closing { min-height:85svh;background:#0a0a0b;color:white;display:grid;place-items:center;text-align:center;padding:100px 24px; }
+    .closing { min-height:85svh;background:#51595b;color:white;display:grid;place-items:center;text-align:center;padding:100px 24px; }
     .closing h2 { font-size:clamp(64px,10vw,148px);line-height:.84;letter-spacing:-.075em;margin:20px 0 30px; }
     .closing p { color:rgba(255,255,255,.45);font-size:19px; }
-    footer { background:#0a0a0b;color:rgba(255,255,255,.38);border-top:1px solid rgba(255,255,255,.08);padding:24px 0;font-size:12px; }
+    footer { background:#464e50;color:rgba(255,255,255,.5);border-top:1px solid rgba(255,255,255,.1);padding:24px 0;font-size:12px; }
     footer .shell { display:flex;justify-content:space-between;gap:20px; }
+
+    .qr-card{position:fixed;z-index:70;left:22px;bottom:22px;display:flex;align-items:center;gap:11px;padding:8px 14px 8px 8px;background:rgba(246,247,244,.9);border:1px solid rgba(32,39,43,.1);box-shadow:0 16px 42px rgba(30,38,40,.2);backdrop-filter:blur(16px);text-decoration:none;color:#253237;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+    .qr-card:hover{transform:translateY(-3px);box-shadow:0 21px 52px rgba(30,38,40,.26)}
+    .qr-card img{width:66px;height:66px;display:block}
+    .qr-copy{display:flex;flex-direction:column;min-width:104px}
+    .qr-copy small{font-size:8px;letter-spacing:.15em;color:#718d5d;font-weight:750}
+    .qr-copy strong{font-size:14px;margin-top:5px;letter-spacing:-.02em}
+    .qr-copy em{font-size:9px;margin-top:3px;color:#718085;font-style:normal}
 
     .reveal { opacity:0; transform:translateY(36px); transition:opacity .9s var(--ease),transform .9s var(--ease); }
     .reveal.visible { opacity:1;transform:none; }
@@ -222,6 +232,9 @@
       .explode { scale:.72;margin:-70px -70px; }
       .layer::after { right:-88px;font-size:9px; }
       footer .shell { flex-direction:column; }
+      .qr-card{left:12px;bottom:12px;padding:6px;border-radius:2px}
+      .qr-card img{width:48px;height:48px}
+      .qr-copy{display:none}
     }
     @media (prefers-reduced-motion: reduce) {
       *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important; }
@@ -231,7 +244,7 @@
 <body>
   <nav class="nav" aria-label="Main navigation">
     <div class="shell nav-inner">
-      <a class="wordmark" href="#top"><span class="nav-mark"><img src="banana-logo.png" alt="Banana Company logo"></span><span>Yphone<span class="accent">°</span></span></a>
+      <a class="wordmark" href="#top"><span class="nav-mark"><img src="banana-logo.png" alt="Banana Company logo"></span><span class="word-block"><span class="word-name">Yphone<span class="accent">°</span></span><small>BANANA COMPANY</small></span></a>
       <div class="nav-links">
         <a href="#forms">Forms</a><a href="#anatomy">Core</a><a href="#impact">Impact</a>
         <a class="nav-cta" href="3d-viewer.html">Explore in 3D</a>
@@ -239,10 +252,15 @@
     </div>
   </nav>
 
+  <a class="qr-card" href="https://allen7772021-arch.github.io/yphone-showcase/3d-viewer.html" target="_blank" rel="noopener" aria-label="Open the Yphone 3D spatial experience">
+    <img src="qr-yphone-3d.png" alt="QR code linking to the Yphone 3D experience">
+    <span class="qr-copy"><small>SCAN TO ENTER</small><strong>Yphone 3D</strong><em>Spatial experience</em></span>
+  </a>
+
   <header class="hero" id="top">
     <div class="shell hero-grid">
       <div class="hero-text reveal">
-        <div class="eyebrow">A device that refuses to become waste</div>
+        <div class="eyebrow">Banana Company presents · A device that refuses to become waste</div>
         <h1>One core.<br>Many forms.</h1>
         <p class="hero-copy"><strong>Yphone is the intelligence you keep.</strong> Wear it, carry it or dock it. When technology moves forward, replace one module—not everything around it.</p>
         <div class="actions">
