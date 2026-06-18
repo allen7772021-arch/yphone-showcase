@@ -221,7 +221,7 @@ scene.add(shadowCatcher);
 // ========== YPHONE CORE (THE PRODUCT) ==========
 const puckGroup = new THREE.Group();
 puckGroup.position.set(0,0.08,0);
-puckGroup.scale.setScalar(1.12);
+puckGroup.scale.setScalar(0.96);
 scene.add(puckGroup);
 
 // Carrier forms sit around the same long-life core.
@@ -297,14 +297,13 @@ puckGroup.add(ledRing);
 
 // ========== INTERCHANGEABLE CARRIERS ==========
 const carrierMat = new THREE.MeshPhysicalMaterial({
-  color:0xcbd6d4,roughness:0.58,metalness:0.06,clearcoat:0.22,clearcoatRoughness:0.55
+  color:0xbcc2c3,roughness:0.5,metalness:0.12,clearcoat:0.24,clearcoatRoughness:0.48
 });
 const carrierDarkMat = new THREE.MeshPhysicalMaterial({
-  color:0x52676a,roughness:0.72,metalness:0.03,clearcoat:0.08,clearcoatRoughness:0.7
+  color:0x292d30,roughness:0.68,metalness:0.05,clearcoat:0.1,clearcoatRoughness:0.68
 });
-const carrierMembraneMat = new THREE.MeshPhysicalMaterial({
-  color:0x8ab8bf,roughness:0.38,metalness:0,transparent:true,opacity:0.28,
-  side:THREE.DoubleSide,depthWrite:false,clearcoat:0.18,clearcoatRoughness:0.48
+const carrierInsetMat = new THREE.MeshPhysicalMaterial({
+  color:0x101315,roughness:0.62,metalness:0.02,clearcoat:0.14,clearcoatRoughness:0.56
 });
 const carrierAccentMat = new THREE.MeshBasicMaterial({
   color:0x55bfd2,transparent:true,opacity:0.58,depthWrite:false
@@ -321,26 +320,23 @@ function roundedBar(w,h,d,r=0.08,mat=carrierMat){
 }
 
 const wristCarrier=new THREE.Group();
-const wristA=roundedBar(0.31,0.72,0.022,0.095,carrierDarkMat);wristA.rotation.x=-Math.PI/2;wristA.position.set(0,-0.006,-0.56);
-const wristB=wristA.clone();wristB.position.z=0.56;
-const wristCradle=new THREE.Mesh(new THREE.TorusGeometry(0.285,0.018,10,64),carrierMat);wristCradle.rotation.x=Math.PI/2;wristCradle.position.y=0.012;
-const wristGlow=new THREE.Mesh(new THREE.TorusGeometry(0.292,0.004,8,64),carrierAccentMat);wristGlow.rotation.x=Math.PI/2;wristGlow.position.y=0.024;
-wristCarrier.add(wristA,wristB,wristCradle,wristGlow);wristCarrier.scale.setScalar(0.001);carrierRoot.add(wristCarrier);
+const wristShell=roundedBar(0.82,1.55,0.026,0.16,carrierDarkMat);wristShell.rotation.x=-Math.PI/2;wristShell.position.y=-0.008;
+const wristInset=roundedBar(0.58,0.82,0.012,0.17,carrierInsetMat);wristInset.rotation.x=-Math.PI/2;wristInset.position.y=0.014;
+const wristCradle=new THREE.Mesh(new THREE.TorusGeometry(0.265,0.014,10,64),carrierMat);wristCradle.rotation.x=Math.PI/2;wristCradle.position.y=0.026;
+const wristGlow=new THREE.Mesh(new THREE.TorusGeometry(0.271,0.0035,8,64),carrierAccentMat);wristGlow.rotation.x=Math.PI/2;wristGlow.position.y=0.036;
+wristCarrier.add(wristShell,wristInset,wristCradle,wristGlow);wristCarrier.scale.setScalar(0.001);carrierRoot.add(wristCarrier);
 
 const handheldCarrier=new THREE.Group();
-const hhTop=roundedBar(0.9,0.06,0.02,0.025,carrierMat);hhTop.rotation.x=-Math.PI/2;hhTop.position.z=-0.72;
-const hhBottom=hhTop.clone();hhBottom.position.z=0.72;
-const hhSide=roundedBar(0.055,1.35,0.02,0.024,carrierMat);hhSide.rotation.x=-Math.PI/2;hhSide.position.x=-0.415;
-const hhSideR=hhSide.clone();hhSideR.position.x=0.415;
-const hhBack=new THREE.Mesh(new THREE.BoxGeometry(0.73,0.008,1.18),carrierMembraneMat);hhBack.position.y=-0.008;
-const hhGlow=new THREE.Mesh(new THREE.TorusGeometry(0.29,0.005,8,64),carrierAccentMat);hhGlow.rotation.x=Math.PI/2;hhGlow.position.y=0.014;
-handheldCarrier.add(hhTop,hhBottom,hhSide,hhSideR,hhBack,hhGlow);handheldCarrier.scale.setScalar(0.001);carrierRoot.add(handheldCarrier);
+const hhShell=roundedBar(1.02,1.72,0.024,0.14,carrierMat);hhShell.rotation.x=-Math.PI/2;hhShell.position.set(0,-0.009,0.1);
+const hhInset=roundedBar(0.91,1.59,0.009,0.115,carrierInsetMat);hhInset.rotation.x=-Math.PI/2;hhInset.position.set(0,0.014,0.1);
+const hhGlow=new THREE.Mesh(new THREE.TorusGeometry(0.27,0.004,8,64),carrierAccentMat);hhGlow.rotation.x=Math.PI/2;hhGlow.position.y=0.028;
+handheldCarrier.add(hhShell,hhInset,hhGlow);handheldCarrier.scale.setScalar(0.001);carrierRoot.add(handheldCarrier);
 
 const dockCarrier=new THREE.Group();
-const dockBase=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.56,0.05,64),carrierDarkMat);dockBase.position.y=-0.014;dockBase.castShadow=true;
-const dockTop=new THREE.Mesh(new THREE.CylinderGeometry(0.47,0.49,0.012,64),carrierMembraneMat);dockTop.position.y=0.018;
-const dockInset=new THREE.Mesh(new THREE.TorusGeometry(0.29,0.014,10,64),carrierMat);dockInset.rotation.x=Math.PI/2;dockInset.position.y=0.028;
-const dockGlow=new THREE.Mesh(new THREE.TorusGeometry(0.48,0.005,8,80),carrierAccentMat);dockGlow.rotation.x=Math.PI/2;dockGlow.position.y=0.031;
+const dockBase=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.68,0.045,64),carrierMat);dockBase.position.y=-0.018;dockBase.castShadow=true;
+const dockTop=new THREE.Mesh(new THREE.CylinderGeometry(0.57,0.6,0.009,64),carrierDarkMat);dockTop.position.y=0.009;
+const dockInset=new THREE.Mesh(new THREE.TorusGeometry(0.267,0.012,10,64),carrierInsetMat);dockInset.rotation.x=Math.PI/2;dockInset.position.y=0.021;
+const dockGlow=new THREE.Mesh(new THREE.TorusGeometry(0.58,0.004,8,80),carrierAccentMat);dockGlow.rotation.x=Math.PI/2;dockGlow.position.y=0.019;
 dockCarrier.add(dockBase,dockTop,dockInset,dockGlow);dockCarrier.scale.setScalar(0.001);carrierRoot.add(dockCarrier);
 
 const carrierGroups={wrist:wristCarrier,handheld:handheldCarrier,dock:dockCarrier};
