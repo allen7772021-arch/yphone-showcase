@@ -6,10 +6,10 @@
 <title>Yphone Core — Interactive System</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{--cyan:#00d4ff;--amber:#ff9500;--green:#44ddaa;--white:#e8f0f8}
+  :root{--cyan:#2f8fa8;--amber:#aa8c45;--green:#718d5d;--white:#20272b;--silver:#d9dbdc;--paper:#f2f2ef}
   body{
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Mono',monospace;
-    background:#000;overflow:hidden;height:100vh;
+    background:#666c6d;overflow:hidden;height:100vh;
     -webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;
     cursor:grab;
   }
@@ -23,65 +23,67 @@
     pointer-events:none;
   }
   .topbar>*{pointer-events:auto}
-  .brand{font-size:18px;font-weight:600;color:var(--white);letter-spacing:-0.01em}
+  .brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600;color:#f5f6f3;letter-spacing:-0.01em}
   .brand em{font-style:normal;color:var(--cyan)}
   .brand a{color:inherit;text-decoration:none}
-  .brand small{display:block;margin-top:5px;font-size:8px;font-weight:500;letter-spacing:.18em;color:#607080}
+  .brand small{display:block;margin-top:5px;font-size:8px;font-weight:500;letter-spacing:.18em;color:#c9cdcd}
+  .brand-logo{width:46px;height:46px;border-radius:50%;overflow:hidden;background:#f7f7f5;border:1px solid rgba(30,35,38,.1);box-shadow:0 8px 24px rgba(60,65,68,.12)}
+  .brand-logo img{width:76px;height:auto;display:block;transform:translate(-14px,-10px);mix-blend-mode:multiply}
   .tag{
-    font-size:10px;letter-spacing:0.12em;color:var(--green);
-    border:1px solid rgba(68,221,170,0.2);border-radius:20px;
-    padding:6px 14px;background:rgba(68,221,170,0.04);
+    font-size:10px;letter-spacing:0.12em;color:#536b48;
+    border:1px solid rgba(60,78,52,.18);border-radius:20px;
+    padding:7px 14px;background:rgba(250,250,247,.58);box-shadow:0 8px 28px rgba(58,63,65,.08);
   }
 
   /* Bottom controls */
   .ctrls{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10;
-    display:flex;gap:6px;background:rgba(10,10,14,0.88);
+    display:flex;gap:6px;background:rgba(245,245,242,0.82);
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border-radius:22px;padding:6px 8px;border:1px solid rgba(255,255,255,0.06);
+    border-radius:22px;padding:6px 8px;border:1px solid rgba(25,30,32,0.09);box-shadow:0 18px 50px rgba(50,55,58,.18);
   }
   .ctrl{
     padding:8px 15px;border-radius:16px;border:1px solid transparent;
-    background:transparent;color:#8899aa;font-size:11px;font-weight:500;
+    background:transparent;color:#69757a;font-size:11px;font-weight:600;
     cursor:pointer;transition:all 0.25s ease;font-family:inherit;
     letter-spacing:0.03em;white-space:nowrap;
   }
-  .ctrl:hover{color:#fff;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.12)}
-  .ctrl.on{background:rgba(0,212,255,0.1);color:var(--cyan);border-color:rgba(0,212,255,0.25)}
+  .ctrl:hover{color:#20272b;background:rgba(255,255,255,.62);border-color:rgba(30,36,38,.12)}
+  .ctrl.on{background:#263238;color:#f4f5f2;border-color:#263238;box-shadow:0 4px 14px rgba(38,50,56,.18)}
   .ctrl.icon{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
-  .ctrl.divider{width:1px;height:20px;padding:0;margin:7px 4px;background:rgba(255,255,255,.08);border:0;border-radius:0;pointer-events:none}
+  .ctrl.divider{width:1px;height:20px;padding:0;margin:7px 4px;background:rgba(30,36,38,.1);border:0;border-radius:0;pointer-events:none}
 
-  .mode-info{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:10;width:220px;color:var(--white);pointer-events:none}
+  .mode-info{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:10;width:238px;color:var(--white);pointer-events:none;background:rgba(247,247,244,.52);border:1px solid rgba(30,36,38,.08);box-shadow:0 22px 70px rgba(70,74,76,.1);backdrop-filter:blur(18px);padding:20px;border-radius:2px}
   .mode-index{font:9px/1 'SF Mono',monospace;letter-spacing:.18em;color:var(--green);margin-bottom:10px}
   .mode-info h1{font-size:28px;line-height:1;letter-spacing:-.04em;margin:0 0 10px;font-weight:600}
-  .mode-info p{font-size:11px;line-height:1.55;color:#718092;margin:0}
-  .layer-key{margin-top:22px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;display:none}
+  .mode-info p{font-size:11px;line-height:1.55;color:#667176;margin:0}
+  .layer-key{margin-top:22px;border-top:1px solid rgba(30,36,38,.09);padding-top:10px;display:none}
   .layer-key.show{display:block}
-  .layer-key span{display:flex;justify-content:space-between;padding:5px 0;font:8px/1.2 'SF Mono',monospace;letter-spacing:.08em;color:#607080}
-  .layer-key b{color:#9eb4c5;font-weight:500}
+  .layer-key span{display:flex;justify-content:space-between;padding:5px 0;font:8px/1.2 'SF Mono',monospace;letter-spacing:.08em;color:#7a8589}
+  .layer-key b{color:#35434a;font-weight:600}
 
   /* Hint */
   .hint{
     position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:10;
-    font-size:11px;color:rgba(136,153,170,0.45);letter-spacing:0.06em;
+    font-size:11px;color:rgba(235,241,241,.55);letter-spacing:0.06em;
     pointer-events:none;transition:opacity 0.8s ease;
   }
 
   /* Info tooltip */
   .tooltip{
     position:fixed;z-index:20;pointer-events:none;
-    background:rgba(10,15,25,0.92);border:1px solid rgba(0,200,240,0.2);
+    background:rgba(248,248,245,.94);border:1px solid rgba(47,143,168,.22);box-shadow:0 16px 45px rgba(50,55,58,.18);
     border-radius:10px;padding:10px 14px;color:var(--white);
     font-size:11px;opacity:0;transition:opacity 0.2s ease;
     transform:translate(-50%,-130%);
   }
   .tooltip.show{opacity:1}
   .tooltip .tt-name{font-weight:600;color:var(--cyan);margin-bottom:3px}
-  .tooltip .tt-detail{color:#8899aa;font-size:10px}
+  .tooltip .tt-detail{color:#718085;font-size:10px}
 
   /* Loading */
   .load{
-    position:fixed;inset:0;z-index:100;background:#000;
+    position:fixed;inset:0;z-index:100;background:#e7e8e6;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:16px;transition:opacity 0.5s ease;
   }
@@ -89,7 +91,7 @@
   .load-ring{width:36px;height:36px;border:1.5px solid rgba(0,212,255,0.12);
     border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .load span{font-size:10px;letter-spacing:0.14em;color:#446677}
+  .load span{font-size:10px;letter-spacing:0.14em;color:#52656d}
 
   @media(max-width:600px){
     .ctrls{left:10px;right:10px;transform:none;gap:2px;padding:4px 5px;overflow-x:auto;justify-content:flex-start}
@@ -110,7 +112,7 @@
 <div class="load" id="load"><div class="load-ring"></div><span>YPHONE SYSTEM · INITIALIZING</span></div>
 
 <div class="topbar">
-  <div class="brand"><a href="index.html">YPHONE<em>°</em>CORE</a><small>MODULAR INTELLIGENCE SYSTEM</small></div>
+  <div class="brand"><span class="brand-logo"><img src="banana-logo.png" alt="Banana Company logo"></span><span><a href="index.html">YPHONE<em>°</em>CORE</a><small>BANANA COMPANY · SPATIAL SYSTEM</small></span></div>
   <div class="tag">● SYSTEM ONLINE</div>
 </div>
 
@@ -137,7 +139,7 @@
   <button class="ctrl" id="modeDock" onclick="setMode('dock')">DOCK</button>
   <span class="ctrl divider"></span>
   <button class="ctrl" id="btnExplode" onclick="t('explode')">EXPLODE</button>
-  <button class="ctrl" id="btnProject" onclick="t('project')">INTERFACE</button>
+  <button class="ctrl on" id="btnProject" onclick="t('project')">INTERFACE</button>
   <button class="ctrl on" id="btnOrbit" onclick="t('orbit')">ORBIT</button>
   <button class="ctrl icon" aria-label="Reset view" onclick="resetAll()">↺</button>
   <button class="ctrl icon" aria-label="Save image" onclick="shot()">◎</button>
@@ -156,12 +158,12 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ========== SCENE ==========
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a0a0e);
-scene.fog = new THREE.Fog(0x0a0a0e, 4, 22);
+scene.background = new THREE.Color(0x666c6d);
+scene.fog = new THREE.Fog(0x666c6d, 7, 26);
 
 const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.3, 50);
-camera.position.set(2.2,1.65,3.2);
-camera.lookAt(0,0.42,0);
+camera.position.set(2.9,2.65,5.45);
+camera.lookAt(0,1.15,0);
 
 const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
 renderer.setSize(innerWidth,innerHeight);
@@ -169,7 +171,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.2;
+renderer.toneMappingExposure=.9;
 document.body.appendChild(renderer.domElement);
 
 // Controls
@@ -178,12 +180,11 @@ ctrl3d.enableDamping=true;ctrl3d.dampingFactor=0.07;
 ctrl3d.autoRotate=true;ctrl3d.autoRotateSpeed=0.3;
 ctrl3d.minDistance=2;ctrl3d.maxDistance=12;
 ctrl3d.maxPolarAngle=Math.PI*0.65;
-ctrl3d.target.set(0,0.42,0);ctrl3d.update();
+ctrl3d.target.set(0,1.15,0);ctrl3d.update();
 
-// ========== LIGHTING (warm room + cool hologram) ==========
-// Warm desk lamp (key)
-const keyLight = new THREE.DirectionalLight(0xffeedd, 3.5);
-keyLight.position.set(3,6,4);
+// ========== LIGHTING (silver studio + cool spatial interface) ==========
+const keyLight = new THREE.DirectionalLight(0xfffdf7, 3.2);
+keyLight.position.set(4,7,5);
 keyLight.castShadow=true;
 keyLight.shadow.mapSize.width=2048;keyLight.shadow.mapSize.height=2048;
 keyLight.shadow.camera.near=0.3;keyLight.shadow.camera.far=30;
@@ -193,23 +194,26 @@ keyLight.shadow.bias=-0.0003;
 scene.add(keyLight);
 
 // Cool hologram fill
-const holoLight = new THREE.PointLight(0x44aacc, 12, 5, 1.5);
+const holoLight = new THREE.PointLight(0x55c7df, 8, 6, 1.5);
 holoLight.position.set(0,2.5,0);
 scene.add(holoLight);
 
 // Rim
-const rimLight = new THREE.DirectionalLight(0x334466, 1.2);
-rimLight.position.set(-3,2,-4);
+const rimLight = new THREE.DirectionalLight(0x9fc6cf, 2.2);
+rimLight.position.set(-4,3,-3);
 scene.add(rimLight);
 
 // Ambient
-scene.add(new THREE.AmbientLight(0x1a1a28,0.5));
+scene.add(new THREE.AmbientLight(0xe8e7e2,.62));
+
+const softFill = new THREE.HemisphereLight(0xf7f7f3,0x4f5658,.8);
+scene.add(softFill);
 
 // ========== DESK ==========
 // Main desk surface
 const deskGeo = new THREE.BoxGeometry(8,0.15,6);
 const deskMat = new THREE.MeshStandardMaterial({
-  color:0x1a1818,roughness:0.35,metalness:0.05
+  color:0x4c5253,roughness:0.32,metalness:0.24
 });
 const desk = new THREE.Mesh(deskGeo,deskMat);
 desk.position.y=-0.075;desk.receiveShadow=true;desk.castShadow=true;
@@ -218,13 +222,13 @@ scene.add(desk);
 // Desk edge bevel highlight
 const deskEdgeGeo = new THREE.BoxGeometry(8.02,0.02,6.02);
 const deskEdge = new THREE.Mesh(deskEdgeGeo,
-  new THREE.MeshStandardMaterial({color:0x2a2626,roughness:0.3,metalness:0.1})
+  new THREE.MeshStandardMaterial({color:0x969a9b,roughness:0.28,metalness:0.3})
 );
 deskEdge.position.y=0;scene.add(deskEdge);
 
 // Subtle desk surface detail (leather pad)
 const padGeo = new THREE.BoxGeometry(2.2,0.005,1.6);
-const padMat = new THREE.MeshStandardMaterial({color:0x181818,roughness:0.6,metalness:0.02});
+const padMat = new THREE.MeshStandardMaterial({color:0xb8c0c1,roughness:0.44,metalness:0.16});
 const pad = new THREE.Mesh(padGeo,padMat);
 pad.position.set(-0.5,0.078,0.3);pad.receiveShadow=true;scene.add(pad);
 
@@ -255,6 +259,7 @@ const handle = new THREE.Mesh(handleGeo,
 handle.position.set(0.18,0.22,0);handle.rotation.z=Math.PI/2;handle.rotation.y=Math.PI/2;
 mugGroup.add(handle);
 
+mugGroup.visible=false;
 scene.add(mugGroup);
 
 // ========== YPHONE CORE (THE PRODUCT) ==========
@@ -335,8 +340,8 @@ ledRing.rotation.x=Math.PI/2;ledRing.position.y=0.045;
 puckGroup.add(ledRing);
 
 // ========== INTERCHANGEABLE CARRIERS ==========
-const carrierMat = new THREE.MeshStandardMaterial({color:0x34363a,roughness:0.32,metalness:0.72});
-const carrierDarkMat = new THREE.MeshStandardMaterial({color:0x111216,roughness:0.48,metalness:0.28});
+const carrierMat = new THREE.MeshStandardMaterial({color:0xbec1c2,roughness:0.27,metalness:0.78});
+const carrierDarkMat = new THREE.MeshStandardMaterial({color:0x51595c,roughness:0.42,metalness:0.38});
 
 function roundedBar(w,h,d,r=0.08,mat=carrierMat){
   const shape=new THREE.Shape();
@@ -416,8 +421,8 @@ beamGroup.add(beamPts);
 
 // ========== HOLOGRAPHIC CONTENT (above the puck) ==========
 const holoRoot = new THREE.Group();
-holoRoot.position.set(0,1.55,0);
-holoRoot.scale.setScalar(0.72);
+holoRoot.position.set(0,1.46,0);
+holoRoot.scale.setScalar(0.86);
 scene.add(holoRoot);
 
 // -- Central AI Core (3D geometric) --
@@ -487,51 +492,65 @@ const aiPointLight = new THREE.PointLight(0x55bbee,6,3,2);
 aiGroup.add(aiPointLight);
 
 // ========== FLOATING DATA PANELS (in arc behind AI core) ==========
-function makePanelTex(title,lines,w=480,h=260){
+function makePanelTex(title,lines,w=720,h=360,primary=false){
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const ctx=c.getContext('2d');
-  ctx.fillStyle='rgba(5,10,22,0.9)';ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='rgba(0,170,210,0.4)';ctx.lineWidth=1;ctx.strokeRect(3,3,w-6,h-6);
+  const bg=ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,'rgba(244,246,243,0.94)');bg.addColorStop(1,'rgba(184,205,208,0.90)');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(42,118,136,0.55)';ctx.lineWidth=2;ctx.strokeRect(4,4,w-8,h-8);
+  ctx.strokeStyle='rgba(55,92,102,0.08)';ctx.lineWidth=1;
+  for(let x=36;x<w;x+=44){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(let y=54;y<h;y+=38){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
   // Corner accents
-  const cs=14;
-  ctx.strokeStyle='rgba(0,212,255,0.65)';ctx.lineWidth=1.5;
+  const cs=25;
+  ctx.strokeStyle='rgba(28,73,84,0.9)';ctx.lineWidth=3;
   [[3,3+cs,3,3,3+cs,3],[w-3-cs,3,w-3,3,w-3,3+cs],[3,h-3-cs,3,h-3,3+cs,h-3],[w-3-cs,h-3,w-3,h-3,w-3,h-3-cs]]
     .forEach(([x1,y1,x2,y2,x3,y3])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x3,y3);ctx.stroke()});
-  ctx.fillStyle='#00d4ff';ctx.font='600 12px "SF Mono",monospace';ctx.fillText(title,16,32);
-  ctx.strokeStyle='rgba(0,150,200,0.2)';ctx.lineWidth=0.5;
-  ctx.beginPath();ctx.moveTo(16,40);ctx.lineTo(w-16,40);ctx.stroke();
-  ctx.font='10px "SF Mono",monospace';
+  ctx.fillStyle='#20383f';ctx.font=`700 ${primary?20:17}px "SF Mono",monospace`;ctx.fillText(title,26,38);
+  ctx.fillStyle='#5a747b';ctx.font='600 10px "SF Mono",monospace';ctx.fillText('BANANA COMPANY / LIVE SPATIAL LAYER',26,58);
+  ctx.fillStyle='#688149';ctx.fillRect(w-118,24,88,22);ctx.fillStyle='#f5f7f2';ctx.font='700 10px "SF Mono",monospace';ctx.fillText('CONNECTED',w-105,39);
+  ctx.strokeStyle='rgba(35,92,105,0.28)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(26,72);ctx.lineTo(w-26,72);ctx.stroke();
+  ctx.font=`${primary?15:14}px "SF Mono",monospace`;
   lines.forEach((l,i)=>{
-    if(l[0]==='>')ctx.fillStyle='#00d4ff';
-    else if(l[0]==='✓')ctx.fillStyle='#44ddaa';
-    else if(l[0]==='!')ctx.fillStyle='#ff9500';
-    else ctx.fillStyle='#8899bb';
-    ctx.fillText(l,16,58+i*17);
+    if(l[0]==='>')ctx.fillStyle='#0d6278';
+    else if(l[0]==='✓')ctx.fillStyle='#456237';
+    else if(l[0]==='!')ctx.fillStyle='#765d26';
+    else ctx.fillStyle='#263a40';
+    ctx.fillText(l,28,105+i*(primary?34:32));
   });
-  const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;return t;
+  ctx.strokeStyle='rgba(31,121,143,.55)';ctx.lineWidth=2;ctx.beginPath();
+  for(let x=28;x<w-28;x+=18){const y=h-32-Math.sin(x*.035)*10-Math.sin(x*.09)*5;x===28?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke();
+  const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;t.colorSpace=THREE.SRGBColorSpace;return t;
 }
 
 const panelDefs=[
-  {p:[0,0.75,-1.8],r:[0.35,0,0],t:'SYSTEM STATUS',l:['> Yphone OS v4.2.7','> Uptime: 847 days','✓ AI Core: OPTIMAL','✓ All Modules: NOMINAL','  Active Processes: 14','  Power Draw: 3.2W']},
-  {p:[1.8,0.4,-1.3],r:[0.2,-0.5,0.05],t:'MODULE HEALTH',l:['> CPU Gen 8  : ██████ 98%','> GPU Gen 7  : █████░ 91%','> AI NPU v2.1: ██████ 100%','> Battery    : ████░░ 82%','✓ Predicted Life: 12.4 yr','  Next Refresh: 2027-Q2']},
-  {p:[2.0,-0.3,-1.5],r:[0.25,-0.55,-0.05],t:'E-WASTE PREVENTION',l:['> Device Lifetime: 4.2 yr','> Prevented Waste: 18.7 kg','> CO₂ Avoided: 142 kg','✓ Modules Recycled: 6','✓ Circular Index: 94%','> Path to Zero: ON TRACK']},
-  {p:[-1.8,0.4,-1.3],r:[0.2,0.5,-0.05],t:'CPU PERFORMANCE',l:['> Gen 8 Hexa-Core','> Clock: 3.8 GHz Base','✓ Temp: 42°C NORMAL','  Load: 23% Average','  IPC Gain: +17%','! Pred. Refresh: 2029']},
-  {p:[-2.0,-0.3,-1.5],r:[0.25,0.55,0.05],t:'GPU ANALYTICS',l:['> Gen 7 Octa-Core','> VRAM: 16 TB Unified','✓ Throughput: OPTIMAL','  RT Perf: +22% YoY','  Power Eff: 94%','✓ Driver: LATEST']},
-  {p:[0,-0.5,-2.2],r:[0.4,0,0],t:'LIVE UPDATE FEED',l:['> [14:32] GPU Optimizer v3','✓ [14:28] Security Patch','> [14:15] Battery Profile','✓ [13:58] AI Model Sync','  [13:42] Sensor Calib.','  [13:30] Network Stack']},
+  {p:[0,0.42,-1.75],r:[0.08,0,0],size:[3.7,1.9],primary:true,delay:0,t:'SPATIAL WORKSPACE',l:['> Yphone Intelligence / ACTIVE','✓ Context layers synchronized','  Voice · Gesture · Vision · Environment','  Current intent: PRODUCT EXPLORATION','✓ Privacy boundary: LOCAL','  Latency: 11 ms / Power: 3.2 W']},
+  {p:[-2.65,0.04,-1.0],r:[0.10,0.55,-0.03],size:[2.55,1.5],delay:.16,t:'MODULE LIFECYCLE',l:['> Spatial Array       96%','> Compute + AI        99%','> Energy Cell         82%','✓ Universal Lock      READY','  Next service: 2029','! Replace one layer only']},
+  {p:[2.65,0.04,-1.0],r:[0.10,-0.55,0.03],size:[2.55,1.5],delay:.28,t:'CIRCULAR IMPACT',l:['> Device lifetime     10+ yr','> Prevented waste     18.7 kg','> CO₂ avoided         142 kg','✓ Modules recovered   94%','✓ Enclosure retained','  Path to zero: ON TRACK']}
 ];
 const panels=[];
+const screenScans=[];
 panelDefs.forEach(d=>{
-  const tex=makePanelTex(d.t,d.l);
-  const geo=new THREE.PlaneGeometry(1.5,0.75);
+  const tex=makePanelTex(d.t,d.l,720,360,!!d.primary);
+  const geo=new THREE.PlaneGeometry(...d.size);
   const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide});
   const panel=new THREE.Mesh(geo,mat);
-  panel.position.set(...d.p);panel.rotation.set(...d.r);
-  panel.userData=d;holoRoot.add(panel);panels.push(panel);
+  panel.position.set(0,0,-.25);panel.rotation.set(...d.r);panel.scale.setScalar(.001);
+  panel.userData={...d,finalPos:new THREE.Vector3(...d.p)};
+  const scanCanvas=document.createElement('canvas');scanCanvas.width=16;scanCanvas.height=128;
+  const sctx=scanCanvas.getContext('2d'),sg=sctx.createLinearGradient(0,0,0,128);
+  sg.addColorStop(0,'rgba(84,192,218,0)');sg.addColorStop(.5,'rgba(84,192,218,.72)');sg.addColorStop(1,'rgba(84,192,218,0)');sctx.fillStyle=sg;sctx.fillRect(0,0,16,128);
+  const scanTex=new THREE.CanvasTexture(scanCanvas);
+  const scan=new THREE.Mesh(new THREE.PlaneGeometry(d.size[0]-.08,.18),new THREE.MeshBasicMaterial({map:scanTex,transparent:true,opacity:.2,depthWrite:false,blending:THREE.NormalBlending}));
+  scan.position.set(0,-d.size[1]/2+.12,.012);panel.add(scan);screenScans.push({mesh:scan,height:d.size[1],delay:d.delay});
+  holoRoot.add(panel);panels.push(panel);
 });
 
 // Connection lines (from AI core to each panel)
 panels.forEach(p=>{
-  const pts=[new THREE.Vector3(0,0,0),p.position.clone()];
+  const pts=[new THREE.Vector3(0,0,0),p.userData.finalPos.clone()];
   const geo=new THREE.BufferGeometry().setFromPoints(pts);
   const line=new THREE.Line(geo,
     new THREE.LineBasicMaterial({color:0x114455,transparent:true,opacity:0.2,depthWrite:false})
@@ -600,7 +619,7 @@ renderer.domElement.addEventListener('click',e=>{
 });
 
 // ========== STATE ==========
-let projectionOn=false,panelsOn=true,exploded=false,carrierMode='core';
+let projectionOn=true,panelsOn=true,exploded=false,carrierMode='core',interfaceChangedAt=performance.now();
 const modeCopy={
   core:{index:'00 / CORE',title:'Yphone Core',description:'The intelligence you keep. Every fast-changing component is isolated, serviceable and ready to move into a new form.'},
   wrist:{index:'01 / WRIST',title:'Wrist',description:'Ambient health, identity and light-touch assistance. The interface stays quiet until the moment needs more.'},
@@ -622,18 +641,20 @@ function t(what){
   if(what==='orbit'){ctrl3d.autoRotate=!ctrl3d.autoRotate;document.getElementById('btnOrbit').classList.toggle('on',ctrl3d.autoRotate)}
   if(what==='project'){
     projectionOn=!projectionOn;document.getElementById('btnProject').classList.toggle('on',projectionOn);
+    interfaceChangedAt=performance.now();
     moveView(projectionOn);
   }
   if(what==='explode'){
     exploded=!exploded;document.getElementById('btnExplode').classList.toggle('on',exploded);
     document.getElementById('layerKey').classList.toggle('show',exploded);
     panelsOn=!exploded;
+    interfaceChangedAt=performance.now();
   }
 }
 window.t=t;
 
 function moveView(showInterface){
-  const sp=camera.position.clone(),ep=showInterface?new THREE.Vector3(3,2.8,5):new THREE.Vector3(2.2,1.65,3.2);
+  const sp=camera.position.clone(),ep=showInterface?new THREE.Vector3(2.9,2.65,5.45):new THREE.Vector3(2.2,1.65,3.2);
   const st=ctrl3d.target.clone(),et=showInterface?new THREE.Vector3(0,1.15,0):new THREE.Vector3(0,0.42,0);
   const s=performance.now();
   (function anim(n){
@@ -644,16 +665,16 @@ function moveView(showInterface){
 }
 
 window.resetAll=function(){
-  const sp=camera.position.clone(),ep=new THREE.Vector3(2.2,1.65,3.2);
-  const st=ctrl3d.target.clone(),et=new THREE.Vector3(0,0.42,0);
+  const sp=camera.position.clone(),ep=new THREE.Vector3(2.9,2.65,5.45);
+  const st=ctrl3d.target.clone(),et=new THREE.Vector3(0,1.15,0);
   const s=performance.now();
   (function anim(n){
     const p=Math.min((n-s)/800,1),e=1-Math.pow(1-p,3);
     camera.position.lerpVectors(sp,ep,e);ctrl3d.target.lerpVectors(st,et,e);
     if(p<1)requestAnimationFrame(anim);
   })(s);
-  projectionOn=false;panelsOn=true;exploded=false;ctrl3d.autoRotate=true;setMode('core');
-  document.getElementById('btnProject').classList.remove('on');
+  projectionOn=true;panelsOn=true;exploded=false;interfaceChangedAt=performance.now();ctrl3d.autoRotate=true;setMode('core');
+  document.getElementById('btnProject').classList.add('on');
   document.getElementById('btnExplode').classList.remove('on');
   document.getElementById('layerKey').classList.remove('show');
   document.getElementById('btnOrbit').classList.add('on');
@@ -670,6 +691,7 @@ const startupParams=new URLSearchParams(location.search);
 const startupMode=startupParams.get('mode');
 if(modeCopy[startupMode])setMode(startupMode);
 if(startupParams.get('explode')==='1')t('explode');
+if(startupParams.get('interface')==='0')t('project');
 
 // Keyboard
 addEventListener('keydown',e=>{
@@ -697,7 +719,7 @@ function animate(){
   ctrl3d.update();
 
   // Hide hint on interaction
-  if(!hintGone&&(Math.abs(ctrl3d.target.x)>0.05||Math.abs(camera.position.x-2.2)>0.1)){
+  if(!hintGone&&(Math.abs(ctrl3d.target.x)>0.05||Math.abs(camera.position.x-2.9)>0.1)){
     document.getElementById('hint').style.opacity='0';hintGone=true;
   }
 
@@ -801,38 +823,54 @@ function animate(){
   }
   beamPts.geometry.attributes.position.needsUpdate=true;
 
-  // Panels
+  // Large spatial screens: delayed fan-out, float and scanning light.
+  const screensOpen=panelsOn&&projectionOn&&!exploded;
+  const revealAge=(performance.now()-interfaceChangedAt)*.001;
   panels.forEach((p,i)=>{
-    const targetOp=panelsOn&&projectionOn&&!exploded?1:0.04;
+    const delay=p.userData.delay||0;
+    const raw=screensOpen?THREE.MathUtils.clamp((revealAge-delay)/.72,0,1):0;
+    const reveal=1-Math.pow(1-raw,3);
+    const targetOp=screensOpen ? .96 : .015;
     p.material.opacity+=(targetOp-p.material.opacity)*dt*4;
-    // Subtle float
-    p.position.y=p.userData.p[1]+Math.sin(t*0.7+i*0.8)*0.06;
+    const targetScale=screensOpen?Math.max(.001,reveal):.001;
+    const scale=THREE.MathUtils.damp(p.scale.x,targetScale,8,dt);p.scale.setScalar(scale);
+    const final=p.userData.finalPos;
+    p.position.x=THREE.MathUtils.damp(p.position.x,THREE.MathUtils.lerp(0,final.x,reveal),7,dt);
+    p.position.y=THREE.MathUtils.damp(p.position.y,THREE.MathUtils.lerp(0,final.y+Math.sin(t*.55+i)*.045,reveal),7,dt);
+    p.position.z=THREE.MathUtils.damp(p.position.z,THREE.MathUtils.lerp(-.25,final.z,reveal),7,dt);
+  });
+  screenScans.forEach((s,i)=>{
+    const cycle=(t*.22+s.delay+i*.16)%1;
+    s.mesh.position.y=-s.height/2+cycle*s.height;
+    s.mesh.material.opacity=screensOpen ? .2 : 0;
   });
 
   // Ambient particles
   ambPts.rotation.y+=dt*0.06;
 
   // Hologram float
-  holoRoot.position.y=1.55+Math.sin(t*0.5)*0.06;
+  holoRoot.position.y=1.46+Math.sin(t*0.5)*0.05;
 
-  // Update live feed panel (index 5)
-  if(panelsOn&&projectionOn&&!exploded&&Math.floor(t)%4===0&&Math.floor(t)!==panels[5]?.userData._lu){
-    const fp=panels[5];if(fp?.userData){
+  // Refresh the primary workspace with a live timestamp.
+  if(panelsOn&&projectionOn&&!exploded&&Math.floor(t)%4===0&&Math.floor(t)!==panels[0]?.userData._lu){
+    const fp=panels[0];if(fp?.userData){
       fp.userData._lu=Math.floor(t);
       const ts=new Date().toTimeString().slice(0,8);
       fp.material.map?.dispose();
-      fp.material.map=makePanelTex('LIVE UPDATE FEED',[
-        `> [${ts}] GPU Optimizer v${Math.floor(Math.random()*5+1)}`,
-        `✓ [${ts}] Self-Check Passed`,
-        `> [${ts}] Module Sync Done`,`✓ [${ts}] Cloud Weights OK`,
-        `  [${ts}] Routine Scan`,'  [${ts}] Idle — Nominal'
-      ]);
+      fp.material.map=makePanelTex('SPATIAL WORKSPACE',[
+        `> Yphone Intelligence / ACTIVE / ${ts}`,
+        `✓ Context layers synchronized`,
+        `  Voice · Gesture · Vision · Environment`,
+        `  Current intent: PRODUCT EXPLORATION`,
+        `✓ Privacy boundary: LOCAL`,
+        `  Latency: 11 ms / Power: 3.2 W`
+      ],720,360,true);
       fp.material.needsUpdate=true;
     }
   }
 
   // Hologram light pulse
-  holoLight.intensity=projectionOn?(11+Math.sin(t*3)*2):2;
+  holoLight.intensity=projectionOn?(7+Math.sin(t*3)*1.2):1.2;
 
   renderer.render(scene,camera);
 }

@@ -38,8 +38,10 @@
       display: flex; align-items: center;
     }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; }
-    .wordmark { font-weight: 680; letter-spacing: -.04em; font-size: 20px; text-decoration: none; }
-    .wordmark span { color: var(--green); }
+    .wordmark { display:flex;align-items:center;gap:9px;font-weight: 680; letter-spacing: -.04em; font-size: 20px; text-decoration: none; }
+    .wordmark .accent { color: var(--green); }
+    .nav-mark{width:34px;height:34px;border-radius:50%;overflow:hidden;background:#f7f7f5;display:block;box-shadow:0 7px 22px rgba(0,0,0,.24)}
+    .nav-mark img{width:56px;height:auto;display:block;transform:translate(-10px,-7px);mix-blend-mode:multiply}
     .nav-links { display: flex; align-items: center; gap: 28px; font-size: 13px; color: rgba(255,255,255,.68); }
     .nav-links a { text-decoration: none; transition: color .2s; }
     .nav-links a:hover { color: white; }
@@ -229,7 +231,7 @@
 <body>
   <nav class="nav" aria-label="Main navigation">
     <div class="shell nav-inner">
-      <a class="wordmark" href="#top">Yphone<span>°</span></a>
+      <a class="wordmark" href="#top"><span class="nav-mark"><img src="banana-logo.png" alt="Banana Company logo"></span><span>Yphone<span class="accent">°</span></span></a>
       <div class="nav-links">
         <a href="#forms">Forms</a><a href="#anatomy">Core</a><a href="#impact">Impact</a>
         <a class="nav-cta" href="3d-viewer.html">Explore in 3D</a>
