@@ -34,6 +34,7 @@
     border:1px solid rgba(60,78,52,.18);border-radius:20px;
     padding:7px 14px;background:rgba(250,250,247,.58);box-shadow:0 8px 28px rgba(58,63,65,.08);
   }
+  .fullscreen-3d{display:inline-flex;align-items:center;gap:7px}
 
   /* Bottom controls */
   .ctrls{
@@ -113,7 +114,7 @@
 
 <div class="topbar">
   <div class="brand"><span class="brand-logo"><img src="banana-logo.png" alt="Banana Company logo"></span><span><a href="index.html">YPHONE<em>°</em>CORE</a><small>BANANA COMPANY · SPATIAL SYSTEM</small></span></div>
-  <div class="tag">● SYSTEM ONLINE</div>
+  <button class="tag fullscreen-3d" type="button" onclick="toggleFullscreen()" aria-label="Enter full screen">⛶ <span>FULL SCREEN</span></button>
 </div>
 
 <aside class="mode-info" aria-live="polite">
@@ -209,58 +210,13 @@ scene.add(new THREE.AmbientLight(0xe8e7e2,.62));
 const softFill = new THREE.HemisphereLight(0xf7f7f3,0x4f5658,.8);
 scene.add(softFill);
 
-// ========== DESK ==========
-// Main desk surface
-const deskGeo = new THREE.BoxGeometry(8,0.15,6);
-const deskMat = new THREE.MeshStandardMaterial({
-  color:0x4c5253,roughness:0.32,metalness:0.24
-});
-const desk = new THREE.Mesh(deskGeo,deskMat);
-desk.position.y=-0.075;desk.receiveShadow=true;desk.castShadow=true;
-scene.add(desk);
-
-// Desk edge bevel highlight
-const deskEdgeGeo = new THREE.BoxGeometry(8.02,0.02,6.02);
-const deskEdge = new THREE.Mesh(deskEdgeGeo,
-  new THREE.MeshStandardMaterial({color:0x969a9b,roughness:0.28,metalness:0.3})
+// Invisible shadow catcher: keeps the product grounded without a table or paper plane.
+const shadowCatcher = new THREE.Mesh(
+  new THREE.PlaneGeometry(16,16),
+  new THREE.ShadowMaterial({color:0x20282b,opacity:.18})
 );
-deskEdge.position.y=0;scene.add(deskEdge);
-
-// Subtle desk surface detail (leather pad)
-const padGeo = new THREE.BoxGeometry(2.2,0.005,1.6);
-const padMat = new THREE.MeshStandardMaterial({color:0xb8c0c1,roughness:0.44,metalness:0.16});
-const pad = new THREE.Mesh(padGeo,padMat);
-pad.position.set(-0.5,0.078,0.3);pad.receiveShadow=true;scene.add(pad);
-
-// ========== COFFEE CUP (for scale) ==========
-const mugGroup = new THREE.Group();
-mugGroup.position.set(2.2,0.08,1.2);
-
-// Mug body
-const mugBodyGeo = new THREE.CylinderGeometry(0.18,0.17,0.4,32,1,true);
-const mugBody = new THREE.Mesh(mugBodyGeo,
-  new THREE.MeshStandardMaterial({color:0xe8e0d8,roughness:0.25,metalness:0.05,side:THREE.DoubleSide})
-);
-mugBody.position.y=0.2;mugBody.castShadow=true;
-mugGroup.add(mugBody);
-
-// Mug bottom
-const mugBottomGeo = new THREE.CylinderGeometry(0.155,0.17,0.03,32);
-const mugBottom = new THREE.Mesh(mugBottomGeo,
-  new THREE.MeshStandardMaterial({color:0xd8d0c8,roughness:0.3,metalness:0.05})
-);
-mugBottom.position.y=0.015;mugGroup.add(mugBottom);
-
-// Mug handle
-const handleGeo = new THREE.TorusGeometry(0.12,0.03,8,16,Math.PI);
-const handle = new THREE.Mesh(handleGeo,
-  new THREE.MeshStandardMaterial({color:0xe8e0d8,roughness:0.25,metalness:0.05})
-);
-handle.position.set(0.18,0.22,0);handle.rotation.z=Math.PI/2;handle.rotation.y=Math.PI/2;
-mugGroup.add(handle);
-
-mugGroup.visible=false;
-scene.add(mugGroup);
+shadowCatcher.rotation.x=-Math.PI/2;shadowCatcher.position.y=-.012;shadowCatcher.receiveShadow=true;
+scene.add(shadowCatcher);
 
 // ========== YPHONE CORE (THE PRODUCT) ==========
 const puckGroup = new THREE.Group();
@@ -491,7 +447,7 @@ for(let i=0;i<aiDotCount;i++){
 const aiPointLight = new THREE.PointLight(0x55bbee,6,3,2);
 aiGroup.add(aiPointLight);
 
-// ========== FLOATING DATA PANELS (in arc behind AI core) ==========
+// ========== FLOATING DATA PANELS (240° panoramic array with an open viewing front) ==========
 function makePanelTex(title,lines,w=720,h=360,primary=false){
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const ctx=c.getContext('2d');
@@ -526,9 +482,11 @@ function makePanelTex(title,lines,w=720,h=360,primary=false){
 }
 
 const panelDefs=[
-  {p:[0,0.42,-1.75],r:[0.08,0,0],size:[3.7,1.9],primary:true,delay:0,t:'SPATIAL WORKSPACE',l:['> Yphone Intelligence / ACTIVE','✓ Context layers synchronized','  Voice · Gesture · Vision · Environment','  Current intent: PRODUCT EXPLORATION','✓ Privacy boundary: LOCAL','  Latency: 11 ms / Power: 3.2 W']},
-  {p:[-2.65,0.04,-1.0],r:[0.10,0.55,-0.03],size:[2.55,1.5],delay:.16,t:'MODULE LIFECYCLE',l:['> Spatial Array       96%','> Compute + AI        99%','> Energy Cell         82%','✓ Universal Lock      READY','  Next service: 2029','! Replace one layer only']},
-  {p:[2.65,0.04,-1.0],r:[0.10,-0.55,0.03],size:[2.55,1.5],delay:.28,t:'CIRCULAR IMPACT',l:['> Device lifetime     10+ yr','> Prevented waste     18.7 kg','> CO₂ avoided         142 kg','✓ Modules recovered   94%','✓ Enclosure retained','  Path to zero: ON TRACK']}
+  {p:[0,.45,-2.5],r:[.05,0,0],size:[3.25,1.7],primary:true,delay:0,t:'SPATIAL WORKSPACE',l:['> Yphone Intelligence / ACTIVE','✓ Context layers synchronized','  Voice · Gesture · Vision · Environment','  Current intent: PRODUCT EXPLORATION','✓ Privacy boundary: LOCAL','  Latency: 11 ms / Power: 3.2 W']},
+  {p:[-2.16,.12,-1.25],r:[.06,1.047,-.03],size:[2.15,1.35],delay:.12,t:'MODULE LIFECYCLE',l:['> Spatial Array       96%','> Compute + AI        99%','> Energy Cell         82%','✓ Universal Lock      READY','  Next service: 2029','! Replace one layer only']},
+  {p:[2.16,.12,-1.25],r:[.06,-1.047,.03],size:[2.15,1.35],delay:.22,t:'CIRCULAR IMPACT',l:['> Device lifetime     10+ yr','> Prevented waste     18.7 kg','> CO₂ avoided         142 kg','✓ Modules recovered   94%','✓ Enclosure retained','  Path to zero: ON TRACK']},
+  {p:[-2.16,.58,1.25],r:[.03,2.094,-.04],size:[1.65,1.02],delay:.32,t:'PERSONAL CONTEXT',l:['> Identity             LOCAL','> Health layer         PRIVATE','> Gesture map          READY','✓ User boundary        LOCKED','  Shared data          NONE']},
+  {p:[2.16,.58,1.25],r:[.03,-2.094,.04],size:[1.65,1.02],delay:.42,t:'ENERGY FLOW',l:['> Core charge          82%','> Dock reserve         64%','> Adaptive draw        3.2 W','✓ Thermal state        STABLE','  Serviceable cell     YES']}
 ];
 const panels=[];
 const screenScans=[];
@@ -686,6 +644,13 @@ window.shot=function(){
   a.download='Yphone_Core_'+carrierMode+'_'+Date.now()+'.png';a.href=renderer.domElement.toDataURL('image/png');a.click();
 };
 
+window.toggleFullscreen=async function(){
+  try{
+    if(!document.fullscreenElement)await document.documentElement.requestFullscreen();
+    else await document.exitFullscreen();
+  }catch(error){}
+};
+
 // Optional deep links are useful for presentations and review captures.
 const startupParams=new URLSearchParams(location.search);
 const startupMode=startupParams.get('mode');
@@ -698,7 +663,7 @@ addEventListener('keydown',e=>{
   switch(e.key.toLowerCase()){
     case'r':t('orbit');break;case'p':t('project');break;
     case'e':t('explode');break;case'1':setMode('core');break;case'2':setMode('wrist');break;case'3':setMode('handheld');break;case'4':setMode('dock');break;case's':if(!e.ctrlKey)shot();break;
-    case'f':document.documentElement.requestFullscreen?.().catch(()=>{});break;
+    case'f':toggleFullscreen();break;
     case'0':resetAll();break;
   }
 });

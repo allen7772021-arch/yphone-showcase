@@ -203,6 +203,9 @@
     .show-live::before{content:'';width:5px;height:5px;border-radius:50%;background:#b7d49e;box-shadow:0 0 8px rgba(183,212,158,.7)}
     .show-progress{position:absolute;left:0;bottom:0;height:2px;width:var(--show-progress,0%);background:#7fc4d2;transition:width .1s linear}
     .show-status.paused .show-live::before{background:#a7aaab;box-shadow:none}
+    .fullscreen-toggle{position:fixed;z-index:73;right:22px;bottom:22px;height:42px;padding:0 15px;border:1px solid rgba(255,255,255,.18);background:rgba(67,75,77,.72);color:#fff;backdrop-filter:blur(14px);display:flex;align-items:center;gap:9px;cursor:pointer;font:700 9px/1 'SF Mono',monospace;letter-spacing:.12em;transition:background .25s var(--ease),transform .25s var(--ease)}
+    .fullscreen-toggle:hover{background:rgba(45,55,58,.9);transform:translateY(-2px)}
+    .fullscreen-toggle svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8}
 
     .team-info{margin-top:42px;color:rgba(255,255,255,.58);font-size:13px;line-height:1.9;letter-spacing:.01em}
     .team-info strong{color:#fff;font-weight:650}
@@ -248,6 +251,8 @@
       .qr-card img{width:48px;height:48px}
       .qr-copy{display:none}
       .show-status{top:auto;bottom:14px;width:178px;padding:7px 9px 8px;font-size:8px}
+      .fullscreen-toggle{right:12px;bottom:62px;width:42px;padding:0;justify-content:center}
+      .fullscreen-toggle span{display:none}
     }
     @media (prefers-reduced-motion: reduce) {
       *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important; }
@@ -268,6 +273,11 @@
   <button class="show-status" id="showStatus" type="button" aria-label="Pause automatic presentation">
     <span class="show-status-row"><span class="show-live" id="showMode">AUTO PRESENTATION</span><span id="showCount">01 / 07</span></span>
     <span class="show-progress" id="showProgress"></span>
+  </button>
+
+  <button class="fullscreen-toggle" id="fullscreenButton" type="button" aria-label="Enter full screen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/></svg>
+    <span id="fullscreenLabel">FULL SCREEN</span>
   </button>
 
   <a class="qr-card" href="https://allen7772021-arch.github.io/yphone-showcase/3d-viewer.html" target="_blank" rel="noopener" aria-label="Open the Yphone 3D spatial experience">
@@ -401,7 +411,9 @@
     const showMode=document.getElementById('showMode');
     const showCount=document.getElementById('showCount');
     const qrCard=document.querySelector('.qr-card');
-    const SHOW_DURATION=9000;
+    const fullscreenButton=document.getElementById('fullscreenButton');
+    const fullscreenLabel=document.getElementById('fullscreenLabel');
+    const SHOW_DURATION=6000;
     const IDLE_RESUME=12000;
     let showIndex=0,showRunning=true,showTimer=null,idleTimer=null,slideStarted=performance.now();
 
@@ -433,6 +445,12 @@
     function resumeShow(){
       showRunning=true;clearTimeout(idleTimer);slideStarted=performance.now();updateShowUI();scheduleShow();
     }
+    async function toggleFullscreen(){
+      try{
+        if(!document.fullscreenElement)await document.documentElement.requestFullscreen();
+        else await document.exitFullscreen();
+      }catch(error){}
+    }
 
     const slideObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
       if(entry.isIntersecting&&entry.intersectionRatio>=.55)activateSlide(slides.indexOf(entry.target));
@@ -442,15 +460,21 @@
     showStatus.addEventListener('click',event=>{
       event.stopPropagation();showRunning?pauseShow():resumeShow();
     });
+    fullscreenButton.addEventListener('click',event=>{event.stopPropagation();toggleFullscreen()});
+    document.addEventListener('fullscreenchange',()=>{
+      const active=Boolean(document.fullscreenElement);
+      fullscreenLabel.textContent=active?'EXIT FULL SCREEN':'FULL SCREEN';
+      fullscreenButton.setAttribute('aria-label',active?'Exit full screen':'Enter full screen');
+    });
     document.addEventListener('pointerdown',event=>{
-      if(!event.target.closest('#showStatus'))pauseShow();
+      if(!event.target.closest('#showStatus,.fullscreen-toggle'))pauseShow();
     });
     document.addEventListener('keydown',event=>{
       if(['ArrowDown','ArrowRight','ArrowUp','ArrowLeft',' '].includes(event.key))event.preventDefault();
       if(event.key==='ArrowDown'||event.key==='ArrowRight'){pauseShow();goToSlide((showIndex+1)%slides.length)}
       if(event.key==='ArrowUp'||event.key==='ArrowLeft'){pauseShow();goToSlide((showIndex-1+slides.length)%slides.length)}
       if(event.key===' '){showRunning?pauseShow():resumeShow()}
-      if(event.key.toLowerCase()==='f')document.documentElement.requestFullscreen?.().catch(()=>{});
+      if(event.key.toLowerCase()==='f')toggleFullscreen();
     });
 
     (function paintProgress(now){
